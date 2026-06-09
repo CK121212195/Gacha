@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordinals Multiverse Gashapon</title>
+    <title>Bitcoin Ordinals Gashapon</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -20,96 +20,88 @@
     <style>
         body {
             font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
-            background-color: #05070f;
+            background-color: #030407;
         }
         .font-game {
             font-family: 'Orbitron', monospace;
         }
-        /* サイバーレトロ・グリッド背景 */
+        /* スチームパンク・グリッド背景 */
         .grid-bg {
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 0.6), #030408),
-                linear-gradient(to right, rgba(247, 147, 26, 0.04) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(247, 147, 26, 0.04) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
+                radial-gradient(circle at 50% 50%, rgba(20, 15, 10, 0.6), #020305),
+                linear-gradient(to right, rgba(247, 147, 26, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(247, 147, 26, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
         }
         /* ネオングロー効果 */
         .glow-orange {
-            box-shadow: 0 0 25px rgba(247, 147, 26, 0.3);
-            border-color: rgba(247, 147, 26, 0.5);
+            box-shadow: 0 0 25px rgba(247, 147, 26, 0.4);
+            border-color: rgba(247, 147, 26, 0.6);
         }
         .glow-text-orange {
-            text-shadow: 0 0 12px rgba(247, 147, 26, 0.7);
+            text-shadow: 0 0 15px rgba(247, 147, 26, 0.8), 0 0 5px rgba(247, 147, 26, 0.5);
         }
-        .glow-border-cyan {
-            border-color: rgba(6, 182, 212, 0.4);
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+        /* 【バグ修正】水平中央揃え(-50%)を維持しながら落下・回転する完璧なキーフレーム */
+        @keyframes drop {
+            0% { transform: translate(-50%, -100px) scale(0.2) rotate(0deg); opacity: 0; }
+            50% { transform: translate(-50%, 5px) scale(1.1) rotate(180deg); opacity: 1; }
+            75% { transform: translate(-50%, -5px) scale(0.95) rotate(270deg); }
+            100% { transform: translate(-50%, 0) scale(1) rotate(360deg); opacity: 1; }
         }
-        /* ガチャ物理揺れアニメーション */
+        .animate-drop {
+            animation: drop 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        /* カプセル発光点滅 */
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 15px rgba(247, 147, 26, 0.6), inset 0 0 8px rgba(255,255,255,0.4); }
+            50% { box-shadow: 0 0 35px rgba(247, 147, 26, 1), inset 0 0 15px rgba(255,255,255,0.8); }
+        }
+        .capsule-glow {
+            animation: pulse-gold 1.0s infinite;
+        }
+        /* 筐体揺れ */
         @keyframes shake {
             0%, 100% { transform: rotate(0deg) scale(1); }
-            20%, 60% { transform: rotate(-3deg) scale(1.02); }
-            40%, 80% { transform: rotate(3deg) scale(1.02); }
+            20%, 60% { transform: rotate(-2deg) scale(1.01); }
+            40%, 80% { transform: rotate(2deg) scale(1.01); }
         }
         .animate-shake {
             animation: shake 0.5s ease-in-out infinite;
         }
-        /* カプセル滑らか落下 */
-        @keyframes drop {
-            0% { transform: translateY(-70px) scale(0.3) rotate(0deg); opacity: 0; }
-            50% { transform: translateY(5px) scale(1.1) rotate(180deg); opacity: 1; }
-            70% { transform: translateY(-5px) scale(0.95) rotate(270deg); }
-            100% { transform: translateY(0) scale(1) rotate(360deg); opacity: 1; }
-        }
-        .animate-drop {
-            animation: drop 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-        /* カプセル開封待機時のゴールドグロー */
-        @keyframes pulse-gold {
-            0%, 100% { box-shadow: 0 0 15px rgba(247, 147, 26, 0.5), inset 0 0 8px rgba(255,255,255,0.4); }
-            50% { box-shadow: 0 0 35px rgba(247, 147, 26, 1), inset 0 0 15px rgba(255,255,255,0.8); }
-        }
-        .capsule-glow {
-            animation: pulse-gold 1.2s infinite;
-        }
-        /* 浮遊物 */
+        /* 浮遊装飾 */
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(5deg); }
+            50% { transform: translateY(-8px) rotate(4deg); }
         }
         .capsule-float {
             animation: float 4s ease-in-out infinite;
-        }
-        /* インナーシャドウ */
-        .shadow-inner-arcade {
-            box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.9);
         }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-orange-500/30 grid-bg">
 
     <!-- ヘッダー -->
-    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+    <header class="border-b border-amber-900/30 bg-slate-950/90 backdrop-blur-md sticky top-0 z-40 shadow-lg">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="bg-gradient-to-r from-orange-500 to-amber-600 p-2.5 rounded-2xl shadow-lg shadow-orange-500/20 border border-orange-400/20">
-                    <i class="fa-solid fa-cube text-xl text-white"></i>
+                <div class="bg-gradient-to-r from-amber-600 to-orange-600 p-2.5 rounded-2xl shadow-lg border border-orange-500/30">
+                    <i class="fa-brands fa-btc text-xl text-white"></i>
                 </div>
                 <div>
-                    <h1 data-i18n="title" class="text-xl font-black tracking-wider font-game text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-500">
-                        ORDINALS MULTIVERSE
+                    <h1 data-i18n="title" class="text-xl font-black tracking-wider font-game text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400">
+                        BITCOIN ORDINALS
                     </h1>
-                    <p data-i18n="subtitle" class="text-xs text-slate-400">L1 On-Chain Gashapon</p>
+                    <p data-i18n="subtitle" class="text-[10px] tracking-widest text-amber-500/70 font-game">100% L1 ON-CHAIN MULTIVERSE</p>
                 </div>
             </div>
-            <!-- 音声 ＆ 言語切り替え -->
+            
             <div class="flex items-center space-x-2.5 text-xs">
                 <!-- 言語切り替え -->
-                <button id="lang-toggle" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition flex items-center space-x-1 font-game tracking-wider text-orange-400 font-bold shadow-md">
+                <button id="lang-toggle" class="px-3 py-1.5 rounded-lg bg-stone-900 border border-amber-900/40 hover:border-amber-500 transition flex items-center space-x-1 font-game tracking-wider text-orange-400 font-bold shadow-md">
                     <i class="fa-solid fa-globe"></i>
                     <span id="lang-text">日本語</span>
                 </button>
-                <button id="sound-toggle" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition flex items-center space-x-1 font-game text-slate-400 hover:text-slate-200">
+                <button id="sound-toggle" class="px-3 py-1.5 rounded-lg bg-stone-900 border border-stone-800 hover:border-stone-700 transition flex items-center space-x-1 font-game text-slate-400 hover:text-slate-200">
                     <i id="sound-icon" class="fa-solid fa-volume-high text-orange-400"></i>
                     <span class="hidden sm:inline">SOUND</span>
                 </button>
@@ -120,65 +112,75 @@
     <!-- メインコンテンツ -->
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8 items-center justify-center">
         
-        <!-- 左側：ガシャポン筐体 -->
+        <!-- 左側：ガシャポン筐体 (Steampunk & Rust Overhaul) -->
         <div class="w-full lg:w-1/2 flex flex-col items-center">
-            <!-- 筐体外枠（リッチなメタル3Dトリムと影） -->
-            <div id="gashapon-machine" class="relative w-72 sm:w-85 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-[35px] p-6 border-4 border-slate-800/80 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col items-center transition-all duration-300">
+            
+            <!-- スチームパンクメタル筐体 -->
+            <div id="gashapon-machine" class="relative w-72 sm:w-85 bg-gradient-to-b from-stone-800 via-stone-900 to-zinc-950 rounded-[35px] p-6 border-4 border-amber-800/80 shadow-[0_25px_60px_-10px_rgba(0,0,0,0.9)] flex flex-col items-center transition-all duration-300">
                 
-                <!-- ガラスドーム（カプセル室） -->
-                <div class="relative w-full h-56 bg-slate-950 rounded-2xl border-2 border-slate-800 overflow-hidden flex items-center justify-center shadow-inner-arcade">
+                <!-- ギミック：稼働する真鍮のギア（CSS回転） -->
+                <div class="absolute -left-3 top-24 text-amber-700/60 text-2xl animate-[spin_12s_linear_infinite]"><i class="fa-solid fa-gear"></i></div>
+                <div class="absolute -left-4 top-32 text-amber-800/50 text-xl animate-[spin_8s_linear_infinite_reverse]"><i class="fa-solid fa-gear"></i></div>
+                <div class="absolute -right-3 top-40 text-amber-700/60 text-2xl animate-[spin_15s_linear_infinite]"><i class="fa-solid fa-gear"></i></div>
+
+                <!-- ガラスドーム -->
+                <div class="relative w-full h-56 bg-gradient-to-b from-black via-stone-950 to-black rounded-2xl border-2 border-amber-900/40 overflow-hidden flex items-center justify-center shadow-[inset_0_4px_30px_rgba(0,0,0,0.9)]">
                     <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none"></div>
                     
-                    <!-- 浮遊するカプセル装飾 -->
+                    <!-- 浮遊カプセル -->
                     <div class="absolute w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-700 border border-white/20 capsule-float top-8 left-6 shadow-lg"></div>
                     <div class="absolute w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 border border-white/20 capsule-float top-16 right-8 shadow-lg" style="animation-delay: -1s;"></div>
                     <div class="absolute w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 border border-white/20 capsule-float bottom-10 left-16 shadow-lg" style="animation-delay: -2s;"></div>
                     <div class="absolute w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 border border-white/20 capsule-float bottom-16 right-16 shadow-lg" style="animation-delay: -1.5s;"></div>
                     <div class="absolute w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-rose-700 border border-white/20 capsule-float top-24 left-24 shadow-lg" style="animation-delay: -3s;"></div>
                     
-                    <!-- 電子ディスプレイ -->
-                    <div class="absolute top-3 px-3 py-1 rounded bg-black border border-slate-800 text-center z-10 w-44">
-                        <span id="display-text" data-i18n="ready" class="font-game text-xs text-orange-400 tracking-widest glow-text-orange">READY</span>
+                    <!-- ディスプレイ -->
+                    <div class="absolute top-3 px-3 py-1 rounded bg-stone-950 border border-amber-900/60 text-center z-10 w-44 shadow-md">
+                        <span id="display-text" data-i18n="ready" class="font-game text-xs text-orange-500 tracking-widest glow-text-orange font-bold">READY</span>
                     </div>
                 </div>
 
-                <!-- 筐体中間部（コイン投入口とハンドル） -->
-                <div class="w-full bg-slate-900/60 rounded-2xl p-4 mt-4 border border-slate-800/80 flex flex-col items-center">
+                <!-- 筐体中間部（アンバー調コインスロットと金属ハンドル） -->
+                <div class="w-full bg-gradient-to-b from-stone-900 to-stone-950 rounded-2xl p-4 mt-4 border border-amber-900/40 flex flex-col items-center">
                     
                     <!-- コイン・価格 -->
                     <div class="flex justify-between items-center w-full px-2 mb-3 text-xs tracking-wider">
-                        <span class="text-slate-400 font-game flex items-center gap-1"><i class="fa-solid fa-coins text-amber-500"></i><span data-i18n="price">PRICE</span></span>
-                        <span class="text-white font-game font-bold text-sm bg-black px-2.5 py-0.5 rounded-md border border-slate-800">10 SATS</span>
+                        <span class="text-amber-500/70 font-game flex items-center gap-1"><i class="fa-solid fa-coins text-amber-500"></i><span data-i18n="price">PRICE</span></span>
+                        <span class="text-orange-400 font-game font-bold text-sm bg-black px-2.5 py-0.5 rounded-md border border-amber-900/30 shadow-inner">10 SATS</span>
                     </div>
 
-                    <!-- 回転ハンドル -->
-                    <div class="relative w-28 h-28 flex items-center justify-center">
-                        <div id="crank-handle" class="w-24 h-24 bg-slate-950 border-4 border-slate-800 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:border-orange-500/80 active:scale-95 transition-all duration-200">
-                            <div class="w-20 h-6 bg-slate-800 rounded-full transform -rotate-45 relative pointer-events-none">
-                                <div class="absolute left-1 top-1 w-4 h-4 bg-slate-600 rounded-full shadow-inner"></div>
-                                <div class="absolute right-1 top-1 w-4 h-4 bg-slate-600 rounded-full shadow-inner"></div>
+                    <!-- 【改善】Image 3 の実機をリスペクトした巨大円形「TURN」ダイアル -->
+                    <div class="relative w-32 h-32 flex items-center justify-center">
+                        <div id="crank-handle" class="w-28 h-28 bg-gradient-to-br from-orange-500 via-amber-600 to-orange-700 border-4 border-stone-800 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(0,0,0,0.6)] cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 relative group">
+                            <!-- 外周目盛り -->
+                            <div class="absolute inset-2 border border-black/30 rounded-full pointer-events-none"></div>
+                            <!-- ダイアルのノブ（つまみ） -->
+                            <div class="w-24 h-8 bg-stone-950/90 rounded-full transform -rotate-45 relative flex items-center justify-between px-3 shadow-md">
+                                <div class="w-3.5 h-3.5 bg-amber-500 rounded-full shadow-inner border border-black/40"></div>
+                                <span class="text-[8px] font-game text-amber-500 font-bold tracking-widest select-none">TURN</span>
+                                <div class="w-3.5 h-3.5 bg-amber-500 rounded-full shadow-inner border border-black/40"></div>
                             </div>
                         </div>
                     </div>
-                    <span data-i18n="twist" class="text-[10px] text-slate-500 font-game mt-2.5 tracking-widest">TWIST HANDLE</span>
+                    <span data-i18n="twist" class="text-[10px] text-amber-500/50 font-game mt-2.5 tracking-widest font-semibold">TWIST DIAL</span>
 
-                    <!-- 【新規】コインスロット風ライトニングインジケータ -->
-                    <div class="flex items-center space-x-1.5 bg-black/90 px-3 py-1 rounded-md border border-orange-500/20 text-[9px] font-game tracking-widest text-orange-400/80 animate-pulse mt-3 shadow-inner">
+                    <!-- コインスロットインジケータ -->
+                    <div class="flex items-center space-x-1.5 bg-black px-3 py-1 rounded border border-orange-500/30 text-[9px] font-game tracking-widest text-orange-400 animate-pulse mt-3 shadow-inner">
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping mr-1"></span>
-                        INSERT 10 SATS
+                        SATOSHIS ONLY
                     </div>
                 </div>
 
-                <!-- 取出口 -->
-                <div class="relative w-full h-24 bg-slate-950 rounded-2xl mt-4 border border-slate-900 shadow-inner flex justify-center items-center">
-                    <div class="absolute inset-0 bg-gradient-to-b from-black/80 to-transparent pointer-events-none"></div>
-                    <div class="w-20 h-10 bg-slate-900/40 rounded-t-lg border-t border-slate-900/60 pointer-events-none"></div>
+                <!-- 【改善】Image 3 のステンレス製取出口を完全に再現 -->
+                <div class="relative w-full h-24 bg-gradient-to-b from-stone-950 to-stone-900 rounded-2xl mt-4 border-2 border-stone-800 shadow-[inset_0_4px_15px_rgba(0,0,0,0.9)] flex justify-center items-center">
+                    <!-- ステンレスの受け皿（手前にせり出すリップ） -->
+                    <div class="absolute bottom-1 w-24 h-6 bg-gradient-to-b from-stone-700 to-stone-850 rounded-t-lg border-t border-stone-500/30 shadow-md"></div>
 
-                    <!-- 出てきたカプセル -->
-                    <div id="dispensed-capsule" class="absolute hidden w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-amber-600 border-2 border-white/40 shadow-xl cursor-pointer hover:scale-105 active:scale-95 transition-all duration-150 z-20 flex flex-col items-center justify-center">
+                    <!-- 【バグ修正完了】完璧に中央に配置され、輝く取り出し口のカプセル -->
+                    <div id="dispensed-capsule" class="absolute left-1/2 -translate-x-1/2 top-3 hidden w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 border-2 border-white/60 shadow-[0_0_20px_rgba(247,147,26,0.8)] cursor-pointer hover:scale-110 active:scale-95 transition-all duration-150 z-20 flex flex-col items-center justify-center">
                         <div class="absolute inset-x-0 h-0.5 bg-white/20 top-1/2 -translate-y-1/2"></div>
-                        <i class="fa-solid fa-gift text-white text-base animate-pulse mb-1"></i>
-                        <span class="text-[8px] font-bold text-amber-300 font-game tracking-widest animate-pulse">TAP</span>
+                        <i class="fa-solid fa-gift text-white text-base animate-pulse mb-0.5"></i>
+                        <span class="text-[8px] font-bold text-amber-200 font-game tracking-widest animate-pulse">TAP</span>
                     </div>
                 </div>
             </div>
@@ -186,24 +188,26 @@
 
         <!-- 右側：コンソール＆説明 -->
         <div class="w-full lg:w-1/2 space-y-6">
-            <div class="bg-slate-950/80 backdrop-blur-md p-6 sm:p-8 rounded-[30px] border border-slate-800/80 shadow-2xl space-y-6">
+            <div class="bg-stone-950/90 backdrop-blur-md p-6 sm:p-8 rounded-[30px] border border-amber-900/30 shadow-2xl space-y-6">
                 <div class="space-y-3">
                     <div class="inline-flex items-center space-x-2 bg-orange-500/10 border border-orange-500/20 text-orange-400 px-3 py-1 rounded-full text-xs font-semibold">
                         <i class="fa-solid fa-bolt text-xs"></i>
-                        <span class="tracking-wide">L1 BITCOIN ON-CHAIN</span>
+                        <span class="tracking-wider">L1 BITCOIN ON-CHAIN</span>
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-                        Ordinals Multiverse<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-500">L1 Gashapon Machine</span>
+                        Ordinals Gashapon<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400">Multiverse Terminal</span>
                     </h2>
-                    <p data-i18n="aboutDesc" class="text-sm text-slate-400 leading-relaxed">
-                        Unlike L2 tokens or smart-contract-based NFTs (such as STX or ERC-721), Bitcoin Ordinals are "Digital Artifacts" permanently inscribed directly on-chain onto individual L1 Satoshis. This machine queries the decentralized indexers in real-time, bringing you 100% pure L1 history.
+                    
+                    <!-- 【改善】ダサい技術説明を廃止！楽しさを全面に出した超ワクワク文言へ -->
+                    <p data-i18n="aboutDesc" class="text-sm text-slate-300 leading-relaxed font-medium">
+                        Explore the vast Ordinals Multiverse! Forget boring static listing pages and turn the physical gears of L1 Bitcoin history. Spin the rusty brass dial, insert 10 sats, and instantly decipher a real-world, immutable digital artifact directly from the parent chain. Let's collect the most legendary inscriptions in the most thrilling arcade format!
                     </p>
                 </div>
 
                 <!-- モード選択 -->
-                <div class="p-4 bg-slate-900/40 rounded-2xl border border-slate-800/80 space-y-3">
+                <div class="p-4 bg-stone-900/60 rounded-2xl border border-amber-900/20 space-y-3">
                     <label data-i18n="modeLabel" class="text-xs font-bold text-slate-400 font-game block"><i class="fa-solid fa-sliders mr-1 text-orange-400"></i>SELECT GASHAPON MODE</label>
-                    <select id="select-mode" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-orange-500">
+                    <select id="select-mode" class="w-full bg-stone-950 border border-amber-900/40 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-orange-500">
                         <option value="multiverse" data-i18n="modeMultiverse">🌌 Multiverse (Random Curated)</option>
                         <option value="ordinal-mimi" data-i18n="modeMimi">🐱 Ordinal MIMI (by OTO)</option>
                         <option value="bitcoin-frogs" data-i18n="modeFrogs">🐸 Bitcoin Frogs</option>
@@ -211,18 +215,18 @@
                         <option value="bitcoin-puppets" data-i18n="modePuppets">🧸 Bitcoin Puppets</option>
                         <option value="quantum-cats" data-i18n="modeCats">🐈 Quantum Cats</option>
                         <option value="runestone" data-i18n="modeRune">🪨 Runestone</option>
-                        <option value="custom" data-i18n="modeCustom">✍️ Enter Custom Slug...</option>
+                        <option value="custom" data-i18n="modeCustom">✍ McKay Custom Slug...</option>
                     </select>
                     
                     <!-- カスタムインプットエリア -->
                     <div id="custom-slug-container" class="hidden space-y-2 pt-1">
-                        <input type="text" id="input-custom-slug" placeholder="e.g., taproot-wizards" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-orange-500">
+                        <input type="text" id="input-custom-slug" placeholder="e.g., taproot-wizards" class="w-full bg-stone-950 border border-amber-900/30 rounded-xl px-3 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-orange-500">
                         <p data-i18n="customHint" class="text-[9px] text-slate-500 leading-relaxed">*Enter the exact collection slug from Ordinals Wallet URL.</p>
                     </div>
                 </div>
 
                 <!-- アクションエリア -->
-                <div class="p-4 bg-slate-900/40 rounded-2xl border border-slate-800/80 flex flex-col space-y-3">
+                <div class="p-4 bg-stone-900/60 rounded-2xl border border-amber-900/20 flex flex-col space-y-3">
                     <button id="btn-play" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-game font-bold py-4 px-6 rounded-xl shadow-lg shadow-orange-500/20 active:scale-[0.99] transition duration-150 text-base tracking-wider flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-play"></i>
                         <span data-i18n="play">SPIN FOR 10 SATS</span>
@@ -238,21 +242,21 @@
 
     <!-- インボイス支払い用モーダル -->
     <div id="payment-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all duration-300 opacity-0">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative space-y-6">
+        <div class="bg-stone-900 border border-amber-900/40 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative space-y-6">
             <!-- 閉じるボタン -->
             <button id="btn-close-payment" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
             <div class="text-center space-y-1">
-                <h3 class="text-lg font-bold font-game tracking-wider">PAY LIGHTNING INVOICE</h3>
+                <h3 class="text-lg font-bold font-game tracking-wider text-orange-400">PAY LIGHTNING INVOICE</h3>
                 <p data-i18n="paymentHint" class="text-xs text-slate-400">Please pay 10 sats to spin the gashapon machine.</p>
             </div>
 
             <!-- QRコード表示エリア -->
             <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-lg relative overflow-hidden">
                 <div id="qrcode"></div>
-                <!-- 支払検知時のローディング・オーバーレイ -->
+                <!-- 支払検知時オーバーレイ -->
                 <div id="payment-success-spinner" class="absolute inset-0 bg-emerald-500/90 flex flex-col items-center justify-center text-white space-y-2 hidden">
                     <i class="fa-solid fa-circle-check text-4xl animate-bounce"></i>
                     <span class="font-game font-bold text-sm">PAID SUCCESS!</span>
@@ -264,7 +268,7 @@
                 <a id="lnk-wallet" href="#" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 block shadow-md shadow-orange-500/10">
                     <i class="fa-solid fa-wallet mr-1"></i>Open Wallet
                 </a>
-                <button id="btn-copy-invoice" class="w-full bg-slate-850 hover:bg-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs transition duration-150 flex items-center justify-center space-x-1">
+                <button id="btn-copy-invoice" class="w-full bg-stone-800 hover:bg-stone-705 text-slate-200 py-2.5 px-4 rounded-xl text-xs transition duration-150 flex items-center justify-center space-x-1">
                     <i class="fa-solid fa-copy"></i>
                     <span id="copy-text">Copy Invoice</span>
                 </button>
@@ -279,19 +283,19 @@
     </div>
 
     <!-- 商品獲得モーダル（美麗ホログラフィック風フレーム） -->
-    <div id="prize-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all duration-300 opacity-0">
-        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800/80 w-full max-w-md rounded-[35px] p-6 shadow-[0_0_50px_rgba(247,147,26,0.15)] relative flex flex-col items-center space-y-6">
+    <div id="prize-modal" class="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all duration-300 opacity-0">
+        <div class="bg-gradient-to-b from-stone-900 to-zinc-950 border border-amber-900/50 w-full max-w-md rounded-[35px] p-6 shadow-[0_0_50px_rgba(247,147,26,0.2)] relative flex flex-col items-center space-y-6">
             
             <div class="text-center space-y-1">
                 <div data-i18n="capsuleOpened" class="text-xs text-amber-500 font-game font-bold tracking-widest uppercase">✨ Capsule Opened ✨</div>
-                <h3 id="prize-name" class="text-xl font-black font-game tracking-wider">MIMI #000</h3>
+                <h3 id="prize-name" class="text-xl font-black font-game tracking-wider text-orange-400">MIMI #000</h3>
             </div>
 
-            <!-- 商品画像表示エリア（ドラムシャッフル時に輝く） -->
+            <!-- リアル画像表示エリア (シャッフルスロット対応) -->
             <div class="relative group">
                 <div id="glow-overlay" class="absolute -inset-1.5 bg-gradient-to-r from-orange-500 to-cyan-500 rounded-2xl blur opacity-75 transition duration-1000"></div>
-                <div class="relative w-72 h-72 sm:w-80 sm:h-80 bg-slate-950 rounded-xl shadow-2xl border-4 border-slate-900 overflow-hidden flex items-center justify-center">
-                    <!-- 画像読込・シャッフル時用スピナー＆文言 -->
+                <div class="relative w-72 h-72 sm:w-80 sm:h-80 bg-black rounded-xl shadow-2xl border-4 border-stone-900 overflow-hidden flex items-center justify-center">
+                    <!-- 画像読込・シャッフルスロット用 -->
                     <div id="prize-img-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 z-10 space-y-3">
                         <i class="fa-solid fa-circle-notch animate-spin text-3xl text-orange-400"></i>
                         <span id="loader-text" data-i18n="loading" class="text-xs font-game text-slate-400">DECRYPTING SATOSHI...</span>
@@ -303,27 +307,27 @@
 
             <!-- ステータス/データ表示 -->
             <div class="grid grid-cols-2 gap-4 w-full max-w-xs text-xs">
-                <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 text-center">
-                    <span data-i18n="insNo" class="text-slate-500 block mb-0.5">INSCRIPTION NO</span>
+                <div class="bg-stone-900/70 p-2.5 rounded-xl border border-amber-900/20 text-center">
+                    <span data-i18n="insNo" class="text-slate-500 block mb-0.5 font-semibold">INSCRIPTION NO</span>
                     <span id="prize-rarity" class="font-bold font-game text-orange-400">#000000</span>
                 </div>
-                <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 text-center flex flex-col justify-center items-center">
-                    <span data-i18n="collection" class="text-slate-500 block mb-0.5">COLLECTION</span>
+                <div class="bg-stone-900/70 p-2.5 rounded-xl border border-amber-900/20 text-center flex flex-col justify-center items-center">
+                    <span data-i18n="collection" class="text-slate-500 block mb-0.5 font-semibold">COLLECTION</span>
                     <span id="prize-palette" class="font-bold font-game text-slate-200 truncate w-full text-center">Unknown</span>
                 </div>
             </div>
 
             <!-- 操作 -->
             <div class="w-full max-w-xs space-y-2">
-                <a id="btn-explorer-link" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-2 shadow-lg shadow-orange-500/10">
+                <a id="btn-explorer-link" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-2 shadow-lg shadow-orange-500/20">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <span data-i18n="btnInspect">Inspect on ordinals.com</span>
                 </a>
                 <div class="flex gap-2">
-                    <button id="btn-close-prize" data-i18n="btnClose" class="w-1/2 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 py-2.5 px-4 rounded-xl text-xs transition duration-150">
+                    <button id="btn-close-prize" data-i18n="btnClose" class="w-1/2 bg-stone-900 hover:bg-stone-800 text-slate-200 border border-amber-900/20 py-2.5 px-4 rounded-xl text-xs transition duration-150">
                         Close
                     </button>
-                    <a id="btn-gamma-link" href="#" target="_blank" rel="noopener noreferrer" class="w-1/2 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 py-2.5 px-4 rounded-xl text-xs transition duration-150 flex items-center justify-center space-x-1">
+                    <a id="btn-gamma-link" href="#" target="_blank" rel="noopener noreferrer" class="w-1/2 bg-stone-900 hover:bg-stone-800 text-slate-200 border border-amber-900/20 py-2.5 px-4 rounded-xl text-xs transition duration-150 flex items-center justify-center space-x-1">
                         <span data-i18n="btnGamma">Official Gamma</span>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
@@ -333,14 +337,14 @@
     </div>
 
     <!-- フッター -->
-    <footer class="border-t border-slate-900/60 bg-slate-950/40 py-8">
+    <footer class="border-t border-amber-900/20 bg-slate-950/80 py-8">
         <div class="max-w-4xl mx-auto px-4 text-center space-y-3">
-            <p data-i18n="aboutTitle" class="text-xs font-bold font-game text-slate-500 tracking-wider">ABOUT BITCOIN L1 DIGITAL ARTIFACTS</p>
-            <p data-i18n="aboutDesc" class="text-[10px] text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                Unlike L2 tokens or smart-contract-based NFTs (such as STX or ERC-721), Bitcoin Ordinals are "Digital Artifacts" permanently inscribed directly on-chain onto individual L1 Satoshis. This machine queries the decentralized indexers in real-time, bringing you 100% pure L1 history.
+            <p data-i18n="aboutTitle" class="text-xs font-bold font-game text-amber-500/70 tracking-wider">ABOUT BITCOIN L1 DIGITAL ARTIFACTS</p>
+            <p data-i18n="aboutDesc" class="text-[11px] text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                Explore the vast Ordinals Multiverse! Forget boring static listing pages and turn the physical gears of L1 Bitcoin history. Spin the rusty brass dial, insert 10 sats, and instantly decipher a real-world, immutable digital artifact directly from the parent chain. Let's collect the most legendary inscriptions in the most thrilling arcade format!
             </p>
             <p class="text-[10px] text-slate-700 font-game pt-3">
-                © 2026 Ordinals Multiverse. Built with LNbits Web API. Directly connected to Bitcoin L1 Indexer.
+                © 2026 Ordinals Multiverse. Directly connected to Bitcoin L1 Indexer.
             </p>
         </div>
     </footer>
@@ -367,6 +371,7 @@
         let activePaymentHash = null;
         let soundEnabled = true;
         let currentLang = "en";
+        let autoTriggerTimeout = null; // 【新機能】開封放置時のセーフガード用タイマー
 
         // カオス・マルチバース用Slugプール
         const CURATED_SLUGS = [
@@ -380,7 +385,7 @@
             "omb"
         ];
 
-        // 【新開発】シャッフルドラム回転演出で表示する実在の美麗OrdinalsインスクリプションID群（10種類）
+        // 高速シャッフルドラム回転演出用画像プール
         const SHUFFLE_ITEMS = [
             "f9787748081fce172ba4ccc8926c0a217d56da8866f21cc32a23015b22d34188i0", // Ordinal MIMI #107
             "3c1626f212260662dcd750c11be30925fb3203f8e65809bb869ec11bf0a2c26ci0", // Bitcoin Frogs
@@ -399,10 +404,10 @@
         // ------------------------------------
         const TRANSLATIONS = {
             en: {
-                title: "ORDINALS MULTIVERSE",
-                subtitle: "L1 On-Chain Gashapon",
+                title: "BITCOIN ORDINALS",
+                subtitle: "100% L1 ON-CHAIN MULTIVERSE",
                 price: "PRICE",
-                twist: "TWIST HANDLE",
+                twist: "TWIST DIAL",
                 play: "SPIN FOR 10 SATS",
                 demo: "FREE PLAY DEMO (TEST)",
                 modeLabel: "SELECT GASHAPON MODE",
@@ -417,7 +422,7 @@
                 customPlaceholder: "e.g., taproot-wizards",
                 customHint: "*Enter the exact collection slug from Ordinals Wallet URL.",
                 aboutTitle: "ABOUT BITCOIN L1 DIGITAL ARTIFACTS",
-                aboutDesc: "Unlike L2 tokens or smart-contract-based NFTs (such as STX or ERC-721), Bitcoin Ordinals are \"Digital Artifacts\" permanently inscribed directly on-chain onto individual L1 Satoshis. This machine queries the decentralized indexers in real-time, bringing you 100% pure L1 history.",
+                aboutDesc: "Explore the vast Ordinals Multiverse! Forget boring static listing pages and turn the physical gears of L1 Bitcoin history. Spin the rusty brass dial, insert 10 sats, and instantly decipher a real-world, immutable digital artifact directly from the parent chain. Let's collect the most legendary inscriptions in the most thrilling arcade format!",
                 ready: "READY",
                 spinning: "SPINNING...",
                 dispensed: "DISPENSED!",
@@ -436,10 +441,10 @@
                 langBtn: "日本語"
             },
             ja: {
-                title: "ORDINALS MULTIVERSE",
-                subtitle: "L1 オンチェーン・ガシャポン",
+                title: "BITCOIN ORDINALS",
+                subtitle: "100% L1 オンチェーン・マルチバース",
                 price: "価格",
-                twist: "ハンドルを回す",
+                twist: "ダイヤルを回す",
                 play: "10 SATS でガチャを回す",
                 demo: "FREE PLAY DEMO (テスト用・無料)",
                 modeLabel: "ガチャのモードを選択",
@@ -454,7 +459,7 @@
                 customPlaceholder: "例: taproot-wizards",
                 customHint: "※ Magic EdenやOrdinals WalletのURL末尾にあるコレクションSlugを入力してください。",
                 aboutTitle: "ビットコインL1デジタル・アーティファクトについて",
-                aboutDesc: "スマートコントラクトやL2ベースのNFT（STXやERC-721等）とは異なり、Bitcoin OrdinalsはL1のサトシ上に直接、永久不滅に刻まれた「デジタル・アーティファクト」です。本サイトは分散型インデクサーをリアルタイムでクエリし、100%純粋なL1データを取得します。",
+                aboutDesc: "オルディナルズ・マルチバースガシャポンへようこそ！退屈な取引板を眺めるのはもうおしまい。錆びついた真鍮のハンドルを力強く回し、ビットコインL1の歴史をその手で動かしましょう。1回わずか10satsで、メインチェーンに永久不滅に刻まれた本物のデジタル・アーティファクトがその場でカプセルから解読・生成されます。史上最もエキサイティングなアーケード形式で、Ordinalsの無限の宇宙を遊び尽くそう！",
                 ready: "準備完了",
                 spinning: "回転中...",
                 dispensed: "カプセル排出！",
@@ -482,12 +487,10 @@
                     el.textContent = TRANSLATIONS[lang][key];
                 }
             });
-            // placeholderの更新
             const customInput = document.getElementById('input-custom-slug');
             if (customInput) {
                 customInput.placeholder = TRANSLATIONS[lang].customPlaceholder;
             }
-            // 言語切替ボタンテキスト
             document.getElementById('lang-text').textContent = TRANSLATIONS[lang].langBtn;
         }
 
@@ -579,16 +582,6 @@
             }
         });
 
-        // カスタムSlug入力枠の表示/非表示制御
-        selectMode.addEventListener('change', () => {
-            if (selectMode.value === 'custom') {
-                customSlugContainer.classList.remove('hidden');
-            } else {
-                customSlugContainer.classList.add('hidden');
-            }
-            playAudio('click');
-        });
-
         // ------------------------------------
         // 💸 Lightning Network API 処理 (LNbits)
         // ------------------------------------
@@ -643,7 +636,6 @@
         // 🎮 ガシャポン・ゲームフロー制御
         // ------------------------------------
 
-        // モーダルの表示切替
         function toggleModal(modal, show) {
             if (show) {
                 modal.classList.remove('hidden');
@@ -658,7 +650,7 @@
             }
         }
 
-        // 回転ハンドルおよび投下演出
+        // 回転ダイアルおよび投下演出
         function playGashaponRotation(seed) {
             currentState = STATE.ROLLING;
             playAudio('motor');
@@ -674,7 +666,7 @@
                 setMachineDisplay(currentLang === "en" ? "DISPENSED!" : "カプセル排出！", "text-emerald-400");
                 playAudio('success');
 
-                // カプセルの表示
+                // カプセルの表示 (落下およびグローエフェクト)
                 dispensedCapsule.classList.remove('hidden');
                 dispensedCapsule.classList.add('animate-drop', 'capsule-glow');
 
@@ -682,21 +674,29 @@
 
                 // カプセル開封アクションの紐付け
                 dispensedCapsule.onclick = () => {
+                    if (autoTriggerTimeout) clearTimeout(autoTriggerTimeout);
                     triggerReveal(seed);
                 };
+
+                // 【改善】カプセル開封忘れを防ぐセーフガード（4秒間タップが無ければ自動でシャッフル画面へ）
+                autoTriggerTimeout = setTimeout(() => {
+                    if (currentState === STATE.HAS_CAPSULE) {
+                        triggerReveal(seed);
+                    }
+                }, 4000);
+
             }, 1500);
         }
 
-        // 【機能向上】スロット・シャッフルアニメーション（API取得待機の退屈を防ぎます）
+        // 【機能向上】至高のゲーム演出：高速スロット・シャッフルアニメーション（カタカタSE同期）
         async function runShuffleAnimation(finalItemId, callback) {
             const pImg = document.getElementById('prize-img');
             const loader = document.getElementById('prize-img-loader');
             
-            // ローダーの一部テキストを変更（DECRYPTING/解読中）
             document.getElementById('loader-text').textContent = TRANSLATIONS[currentLang].loading;
 
             let shuffleTicks = 0;
-            const totalTicks = 16; // 高速で入れ替わる総数
+            const totalTicks = 18; // 高速で入れ替わるループフレーム数
             let currentIdx = 0;
 
             loader.classList.add('hidden');
@@ -704,19 +704,18 @@
 
             function tick() {
                 if (shuffleTicks < totalTicks) {
-                    // シャッフル用画像のプールから順に高速表示
                     const itemID = SHUFFLE_ITEMS[currentIdx];
                     pImg.src = `https://cdn.ordinalswallet.com/inscription/preview/${itemID}`;
-                    playAudio('click'); // カタカタと小気味良いSE
+                    playAudio('click'); // コツコツと心地よい物理ドラムSE
 
                     currentIdx = (currentIdx + 1) % SHUFFLE_ITEMS.length;
                     shuffleTicks++;
 
                     // 徐々に遅くなるようにしてドラムロールの緊張感を演出
-                    let delay = 65 + (shuffleTicks * 15);
+                    let delay = 60 + (shuffleTicks * 15);
                     setTimeout(tick, delay);
                 } else {
-                    // 最終的に引き当てた本物のアートを決定・ロード
+                    // ドラムの終わりに引き当てた本物のアートを適用・ロード
                     const realImgUrl = `https://cdn.ordinalswallet.com/inscription/preview/${finalItemId}`;
                     pImg.src = realImgUrl;
                     pImg.onload = () => {
@@ -726,7 +725,7 @@
                             spread: 75,
                             origin: { y: 0.6 }
                         });
-                        callback(); // アニメーション終了時の処理（画像フェードインなど）
+                        callback(); // フェード完了等
                     };
                 }
             }
@@ -753,10 +752,9 @@
             pImg.classList.add('opacity-0');
             loader.classList.remove('hidden');
 
-            // 1. ガチャモードに基づき対象のSlug（コレクション識別名）を決定
             let targetSlug = selectMode.value;
 
-            // シード値（支払いハッシュ等）から一意の乱数を生成
+            // ハッシュシードから乱数を生成
             let hash = 0;
             for (let i = 0; i < seed.length; i++) {
                 hash = seed.charCodeAt(i) + ((hash << 5) - hash);
@@ -770,7 +768,7 @@
                 if (!targetSlug) targetSlug = "ordinal-mimi";
             }
 
-            // 2. 決定したSlugの全データリストをAPIからリアルタイムクエリ
+            // コレクションの全データリストをAPIからクエリ
             let inscriptionsList = [];
             try {
                 const response = await fetch(`https://turbo.ordinalswallet.com/collection/${targetSlug}/inscriptions`);
@@ -796,25 +794,24 @@
                 return;
             }
 
-            // 3. データプールからハッシュに基づき一意の1点を選出
+            // ハッシュに基づき一意の1点を選出
             const finalIdx = Math.abs(hash) % inscriptionsList.length;
             const wonItem = inscriptionsList[finalIdx];
             const wonItemId = wonItem.id || wonItem.inscription_id || wonItem.inscriptionId;
             const wonItemNum = wonItem.num || wonItem.number || wonItem.inscription_number || wonItem.inscriptionNumber || "On-Chain";
             const wonItemName = (wonItem.meta && wonItem.meta.name) ? wonItem.meta.name : (`#${wonItemNum}`);
 
-            // 4. データロードが裏で完了したと同時に、スロット・シャッフルアニメーションを稼働
+            // データプールロード完了時にスロットシャッフルを作動
             runShuffleAnimation(wonItemId, () => {
-                // シャッフル終了後に情報を反映して輝かせる
                 document.getElementById('prize-name').textContent = wonItemName;
                 document.getElementById('prize-rarity').textContent = `#${wonItemNum}`;
                 document.getElementById('prize-palette').textContent = targetSlug.toUpperCase();
 
-                // メインの検証用URLを公式の「ordinals.com」に変更
+                // メイン検証用URLを公式 ordinals.com 直リンクに変更
                 const explorerBtn = document.getElementById('btn-explorer-link');
                 explorerBtn.href = `https://ordinals.com/inscription/${wonItemId}`;
 
-                // 予備のGamma詳細ページ
+                // 予備のGamma
                 const gammaLink = document.getElementById('btn-gamma-link');
                 gammaLink.href = `https://gamma.io/inscription/${wonItemId}`;
             });
@@ -879,7 +876,6 @@
                 pollInterval = setInterval(async () => {
                     const isPaid = await checkInvoiceStatus(activePaymentHash);
                     if (isPaid) {
-                        // 支払完了検知
                         clearInterval(pollInterval);
                         document.getElementById('payment-success-spinner').classList.remove('hidden');
                         playAudio('success');
