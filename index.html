@@ -52,7 +52,6 @@
         .font-game {
             font-family: 'Orbitron', monospace;
         }
-        /* ネオングロー効果 */
         .glow-orange {
             box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
             border-color: rgba(245, 158, 11, 0.5);
@@ -60,7 +59,6 @@
         .glow-text-orange {
             text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
         }
-        /* ガチャカプセル揺れアニメーション */
         @keyframes shake {
             0%, 100% { transform: rotate(0deg); }
             20%, 60% { transform: rotate(-5deg); }
@@ -69,7 +67,6 @@
         .animate-shake {
             animation: shake 0.6s ease-in-out infinite;
         }
-        /* カプセル降下アニメーション */
         @keyframes drop {
             0% { transform: translateY(-70px) scale(0.3) rotate(0deg); opacity: 0; }
             50% { transform: translateY(5px) scale(1.1) rotate(180deg); opacity: 1; }
@@ -79,7 +76,6 @@
         .animate-drop {
             animation: drop 1.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
-        /* カプセル開封待機時のゴールドグロー点滅効果 */
         @keyframes pulse-gold {
             0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.6), inset 0 0 8px rgba(255,255,255,0.4); }
             50% { box-shadow: 0 0 30px rgba(245, 158, 11, 1), inset 0 0 15px rgba(255,255,255,0.8); }
@@ -87,13 +83,9 @@
         .capsule-glow {
             animation: pulse-gold 1.5s infinite;
         }
-        /* 当選画像のフェードイン演出 */
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        /* スムーズなフェードトランジション用 */
+        .fade-transition {
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-out;
         }
     </style>
 </head>
@@ -115,12 +107,10 @@
             </div>
             
             <div class="flex items-center space-x-2 text-sm">
-                <!-- 言語切替ボタン -->
                 <button id="lang-toggle" class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 transition flex items-center space-x-1.5 font-bold text-xs border border-amber-200">
                     <i class="fa-solid fa-globe text-orange-500"></i>
                     <span id="lang-toggle-text">JP / EN</span>
                 </button>
-                <!-- 音声 -->
                 <button id="sound-toggle" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition flex items-center space-x-1 border border-slate-200">
                     <i id="sound-icon" class="fa-solid fa-volume-high text-orange-500"></i>
                     <span class="hidden sm:inline text-xs font-bold text-slate-600">SOUND</span>
@@ -136,26 +126,21 @@
         <div class="w-full lg:w-1/2 flex flex-col items-center">
             <div id="gashapon-machine" class="relative w-72 sm:w-80 bg-white rounded-[2.5rem] p-6 border-4 border-amber-200 shadow-2xl flex flex-col items-center transition-all duration-300">
                 
-                <!-- 3Dガシャポン画像配置エリア -->
                 <div class="relative w-full h-56 bg-amber-50/50 rounded-2xl border-2 border-amber-100 overflow-hidden flex items-center justify-center shadow-inner group">
                     <img id="gashapon-interior-img" src="./gashapon-machine.png" alt="Gashapon Machine" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&q=80&w=600';">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
                     
-                    <!-- 電子ディスプレイ -->
                     <div class="absolute top-3 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-400 text-center z-10 w-44 shadow-md">
                         <span id="display-text" class="font-game text-xs text-amber-400 tracking-widest glow-text-orange">READY</span>
                     </div>
                 </div>
 
-                <!-- 筐体中間部（コイン投入口とハンドル） -->
                 <div class="w-full bg-amber-50/60 rounded-2xl p-4 mt-4 border border-amber-200/60 flex flex-col items-center">
-                    <!-- コイン・支払い価格表示 -->
                     <div class="flex justify-between items-center w-full px-2 mb-3 text-xs tracking-wider font-bold">
                         <span id="price-label" class="text-slate-500 font-game"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>PRICE</span>
                         <span class="text-orange-600 font-game font-black text-sm bg-orange-100/60 px-2 py-0.5 rounded-md border border-orange-200">300 SATS</span>
                     </div>
 
-                    <!-- 回転ハンドル -->
                     <div class="relative w-28 h-28 flex items-center justify-center">
                         <div id="crank-handle" class="w-24 h-24 bg-white border-4 border-amber-300 rounded-full flex items-center justify-center shadow-md cursor-pointer hover:border-orange-500 active:scale-95 transition-all duration-200">
                             <div class="w-20 h-6 bg-amber-400 rounded-full transform -rotate-45 relative pointer-events-none">
@@ -167,12 +152,10 @@
                     <span id="twist-handle-label" class="text-[10px] text-slate-500 font-game mt-2 font-bold tracking-widest">TWIST HANDLE</span>
                 </div>
 
-                <!-- 取出口 -->
                 <div class="relative w-full h-24 bg-slate-100 rounded-2xl mt-4 border border-amber-200/50 shadow-inner overflow-hidden flex justify-center items-center">
                     <div class="absolute inset-0 bg-gradient-to-b from-black/5 to-transparent pointer-events-none"></div>
                     <div class="w-20 h-10 bg-slate-200/40 rounded-t-lg border-t border-slate-300/40 pointer-events-none"></div>
 
-                    <!-- 出てきたカプセル -->
                     <div id="dispensed-capsule" class="absolute hidden w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 border-2 border-white shadow-xl cursor-pointer hover:scale-105 active:scale-95 transition-all duration-150 z-20 flex flex-col items-center justify-center">
                         <div class="absolute inset-x-0 h-0.5 bg-white/20 top-1/2 -translate-y-1/2"></div>
                         <i class="fa-solid fa-gift text-white text-base animate-pulse mb-1"></i>
@@ -198,7 +181,6 @@
                     </p>
                 </div>
 
-                <!-- コレクション選択・カスタムSlug入力パネル -->
                 <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/60 space-y-3">
                     <label id="label-mode" class="text-xs font-black text-slate-500 font-game block"><i class="fa-solid fa-sliders mr-1 text-orange-500"></i>SELECT GASHAPON MODE</label>
                     <select id="select-mode" class="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-slate-700 font-medium focus:outline-none focus:border-orange-500 shadow-sm">
@@ -209,25 +191,23 @@
                         <option value="bitcoin-puppets">🧸 Bitcoin Puppets</option>
                         <option value="bitcoin-punks">👤 Bitcoin Punks</option>
                         <option value="bitcoin-monkes">🦍 Bitcoin Monkes</option>
-                        <option value="verylongpepes">🐸 VeryLongPepes</option>
+                        <!-- 修正: very-long-pepes -->
+                        <option value="very-long-pepes">🐸 VeryLongPepes</option>
                         <option value="anons">🎭 Anons</option>
                         <option value="custom">✍️ Custom Slug...</option>
                     </select>
                     
-                    <!-- カスタムインプットエリア（custom選択時に表示） -->
                     <div id="custom-slug-container" class="hidden space-y-2 pt-1">
                         <input type="text" id="input-custom-slug" placeholder="e.g., taproot-wizards" class="w-full bg-white border border-amber-200 rounded-xl px-3 py-2.5 text-xs text-slate-700 font-semibold placeholder-slate-400 focus:outline-none focus:border-orange-500 shadow-sm">
                         <p id="custom-slug-helper" class="text-[9px] text-slate-400 font-medium leading-relaxed">*Please enter the unique 'Slug' found at the end of the collection's marketplace URL (e.g., Magic Eden or Ordinals Wallet).</p>
                     </div>
                 </div>
 
-                <!-- アクションエリア -->
                 <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/60 flex flex-col space-y-3">
                     <button id="btn-play" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-game font-bold py-4 px-6 rounded-xl shadow-lg shadow-orange-500/10 active:scale-[0.99] transition duration-150 text-base tracking-wider flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-play"></i>
                         <span id="btn-play-text">SPIN GASHAPON FOR 300 SATS</span>
                     </button>
-                    <!-- フリーデモ機能 -->
                     <button id="btn-demo" class="text-xs text-slate-400 hover:text-slate-600 transition text-center underline font-game font-bold">
                         FREE PLAY DEMO (Test Mode)
                     </button>
@@ -275,19 +255,25 @@
             
             <div class="text-center space-y-1">
                 <div id="capsule-opened-text" class="text-xs text-amber-500 font-game font-black tracking-widest uppercase">✨ Capsule Opened ✨</div>
-                <h3 id="prize-name" class="text-xl font-black font-game tracking-wider text-slate-800">MINTING / SHUFFLING...</h3>
+                <h3 id="prize-name" class="text-xl font-black font-game tracking-wider text-slate-800">MINTING...</h3>
             </div>
 
-            <!-- 商品の画像表示エリア（シャッフルアニメーション用） -->
+            <!-- 画像表示・ローディングエリア (明るい仕様に変更) -->
             <div class="relative group">
-                <div class="absolute -inset-1.5 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <div class="relative w-72 h-72 sm:w-80 sm:h-80 bg-slate-900 rounded-2xl shadow-2xl border-4 border-white overflow-hidden flex items-center justify-center">
-                    <!-- 画像読込スピナー -->
-                    <div id="prize-img-loader" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-10 hidden">
-                        <i class="fa-solid fa-circle-notch animate-spin text-3xl text-orange-400"></i>
+                <div class="absolute -inset-1.5 bg-gradient-to-r from-orange-400 to-amber-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div class="relative w-72 h-72 sm:w-80 sm:h-80 bg-amber-50 rounded-2xl shadow-2xl border-4 border-white overflow-hidden flex items-center justify-center">
+                    
+                    <!-- 🌟 明るくて可愛いローディング画面 -->
+                    <div id="prize-img-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 z-10 fade-transition">
+                        <div class="relative w-16 h-16 flex items-center justify-center mb-4">
+                            <div class="absolute inset-0 border-4 border-orange-300 rounded-full animate-ping opacity-60"></div>
+                            <i class="fa-solid fa-cube text-4xl text-orange-500 animate-bounce relative z-10 drop-shadow-md"></i>
+                        </div>
+                        <span id="loading-spinner-text" class="font-game text-sm font-bold text-orange-600 animate-pulse tracking-widest">LOADING ARTIFACT...</span>
                     </div>
+
                     <!-- 本物のオンチェーン画像 -->
-                    <img id="prize-img" class="w-full h-full object-contain relative z-0 opacity-100" src="" alt="Ordinals Art">
+                    <img id="prize-img" class="w-full h-full object-contain relative z-0 opacity-0 transform scale-95 fade-transition" src="" alt="Ordinals Art">
                 </div>
             </div>
 
@@ -305,7 +291,7 @@
 
             <!-- 操作 -->
             <div class="w-full max-w-xs space-y-2 relative">
-                <!-- シャッフル中はこのエリアをブロック -->
+                <!-- 読込中ブロック用オーバーレイ -->
                 <div id="action-blocker" class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 rounded-xl"></div>
                 <a id="btn-explorer-link" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-2 shadow-md shadow-orange-500/10 opacity-50 pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -324,7 +310,7 @@
         </div>
     </div>
 
-    <!-- フッター & リンクバー -->
+    <!-- フッター -->
     <footer class="border-t border-amber-200/40 bg-white/50 py-8">
         <div class="max-w-4xl mx-auto px-4 text-center space-y-6">
             <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-slate-500 bg-amber-50/60 px-4 py-2.5 rounded-full border border-amber-200/50 max-w-lg mx-auto shadow-sm">
@@ -348,35 +334,28 @@
         </div>
     </footer>
 
-    <!-- 💡 ロジック制御スクリプト -->
+    <!-- ロジック -->
     <script>
-        // 設定
         const LNBITS_URL = "https://demo.lnbits.com";
         const INVOICE_READ_KEY = "67e5b0ad270f44d19e6d768bb3314e49";
-        const SPIN_AMOUNT = 300; // 300 sats
+        const SPIN_AMOUNT = 300; 
 
-        const STATE = {
-            IDLE: "idle",
-            INVOICING: "invoicing",
-            PENDING: "pending",
-            ROLLING: "rolling",
-            HAS_CAPSULE: "has_capsule",
-            REVEALED: "revealed"
-        };
+        const STATE = { IDLE: "idle", INVOICING: "invoicing", PENDING: "pending", ROLLING: "rolling", HAS_CAPSULE: "has_capsule", REVEALED: "revealed" };
         let currentState = STATE.IDLE;
         let pollInterval = null;
         let activePaymentHash = null;
         let soundEnabled = true;
         let currentLang = 'en';
 
-        // プール
+        // 修正: very-long-pepes に変更
         const CURATED_SLUGS = [
             "ordinal-mimi", "bitcoin-frogs", "nodemonkes", "bitcoin-puppets",
-            "bitcoin-punks", "bitcoin-monkes", "verylongpepes", "anons"
+            "bitcoin-punks", "bitcoin-monkes", "very-long-pepes", "anons"
         ];
 
-        // 高速シャッフル（スロット演出）用 & API失敗時のフォールバック用IDリスト
-        const SHUFFLE_IDS = [
+        // 🌟 API失敗時用のフォールバック（緊急用モック）データリスト
+        // これにより、取得に失敗してもエラーで止まることなく、本物のOrdinals画像を必ず提供します
+        const FALLBACK_IDS = [
             "0dfa3a9366e6c466472f8888bf409976fc2713fa432c4dccf2f64485522c3ci0",
             "0256dbe126742512684ab33a201c13bfda63fc50486a4e32d56a298288cf64eei0",
             "c369c0d10e54bf83dfab7ec38be0d8be0d8be09febe6fc25027552554702fb7ci0",
@@ -389,17 +368,6 @@
             "bf6e2a92dd3e599b598b5f2e83e06cf58d61ff418d61ff414a1d8dbcb7db16f0i0"
         ];
 
-        // 🚀 【UX改善】ページを開いた瞬間にスロット用画像を完全キャッシュ（チラつき防止）
-        const preloadedImages = [];
-        window.addEventListener('DOMContentLoaded', () => {
-            SHUFFLE_IDS.forEach(id => {
-                const img = new Image();
-                img.src = `https://cdn.ordinalswallet.com/inscription/preview/${id}`;
-                preloadedImages.push(img.src);
-            });
-        });
-
-        // 翻訳辞書
         const TRANSLATIONS = {
             en: {
                 pageTitle: "Bitcoin Ordinals Gashapon",
@@ -426,6 +394,7 @@
                 paymentCopySuccess: "Copied!",
                 paymentWaiting: "Waiting for payment verification...",
                 capsuleOpened: "✨ Capsule Opened ✨",
+                loadingText: "MINTING ARTIFACT...",
                 verifyOnChain: "Verify On-Chain (ordinals.com)",
                 closeBtn: "Close",
                 gammaBtn: "Official Gamma",
@@ -465,6 +434,7 @@
                 paymentCopySuccess: "コピー完了！",
                 paymentWaiting: "支払いの確認を待機しています...",
                 capsuleOpened: "✨ カプセル開封 ✨",
+                loadingText: "アーティファクト取得中...",
                 verifyOnChain: "ordinals.com でオンチェーン鑑定",
                 closeBtn: "閉じる",
                 gammaBtn: "公式Gamma",
@@ -507,49 +477,37 @@
             document.getElementById('payment-waiting-text').textContent = t.paymentWaiting;
             
             document.getElementById('capsule-opened-text').textContent = t.capsuleOpened;
+            document.getElementById('loading-spinner-text').textContent = t.loadingText;
             document.getElementById('btn-explorer-link-text').textContent = t.verifyOnChain;
             document.getElementById('btn-close-prize').textContent = t.closeBtn;
             document.getElementById('btn-gamma-link-text').textContent = t.gammaBtn;
 
             const select = document.getElementById('select-mode');
-            select.options[0].text = t.optMultiverse;
-            select.options[1].text = t.optMimi;
-            select.options[2].text = t.optFrogs;
-            select.options[3].text = t.optMonkes;
-            select.options[4].text = t.optPuppets;
-            select.options[5].text = t.optPunks;
-            select.options[6].text = t.optBMonkes;
-            select.options[7].text = t.optPepes;
-            select.options[8].text = t.optAnons;
-            select.options[9].text = t.optCustom;
+            select.options[0].text = t.optMultiverse; select.options[1].text = t.optMimi;
+            select.options[2].text = t.optFrogs; select.options[3].text = t.optMonkes;
+            select.options[4].text = t.optPuppets; select.options[5].text = t.optPunks;
+            select.options[6].text = t.optBMonkes; select.options[7].text = t.optPepes;
+            select.options[8].text = t.optAnons; select.options[9].text = t.optCustom;
 
             updateDisplayStateText();
         }
 
         function updateDisplayStateText() {
             const t = TRANSLATIONS[currentLang];
-            let text = t.ready;
-            let colorClass = "text-amber-500";
-            
-            if (currentState === STATE.INVOICING) {
-                text = t.invoicing; colorClass = "text-slate-500";
-            } else if (currentState === STATE.ROLLING) {
-                text = t.spinning; colorClass = "text-orange-500";
-            } else if (currentState === STATE.HAS_CAPSULE) {
-                text = t.dispensed; colorClass = "text-emerald-500";
-            } else if (currentState === STATE.REVEALED) {
-                text = t.ready; colorClass = "text-amber-500";
-            }
-            setMachineDisplay(text, colorClass);
+            let text = t.ready; let colorClass = "text-amber-500";
+            if (currentState === STATE.INVOICING) { text = t.invoicing; colorClass = "text-slate-500"; } 
+            else if (currentState === STATE.ROLLING) { text = t.spinning; colorClass = "text-orange-500"; } 
+            else if (currentState === STATE.HAS_CAPSULE) { text = t.dispensed; colorClass = "text-emerald-500"; } 
+            else if (currentState === STATE.REVEALED) { text = t.ready; colorClass = "text-amber-500"; }
+            document.getElementById('display-text').textContent = text;
+            document.getElementById('display-text').className = `font-game text-xs tracking-widest glow-text-orange ${colorClass}`;
         }
 
-        // 音声設定 (Web Audio API)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playAudio(type) {
             if (!soundEnabled) return;
             try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                 osc.connect(gain); gain.connect(audioCtx.destination);
                 const now = audioCtx.currentTime;
 
@@ -573,28 +531,6 @@
             } catch (e) { console.warn("Audio error: ", e); }
         }
 
-        // DOMの取得
-        const btnPlay = document.getElementById('btn-play');
-        const btnDemo = document.getElementById('btn-demo');
-        const paymentModal = document.getElementById('payment-modal');
-        const prizeModal = document.getElementById('prize-modal');
-        const qrcodeContainer = document.getElementById('qrcode');
-        const copyText = document.getElementById('copy-text');
-        const btnCopyInvoice = document.getElementById('btn-copy-invoice');
-        const lnkWallet = document.getElementById('lnk-wallet');
-        const btnClosePayment = document.getElementById('btn-close-payment');
-        const btnClosePrize = document.getElementById('btn-close-prize');
-        const soundToggle = document.getElementById('sound-toggle');
-        const soundIcon = document.getElementById('sound-icon');
-        const langToggle = document.getElementById('lang-toggle');
-        const gashaponMachine = document.getElementById('gashapon-machine');
-        const crankHandle = document.getElementById('crank-handle');
-        const dispensedCapsule = document.getElementById('dispensed-capsule');
-        const displayText = document.getElementById('display-text');
-        const selectMode = document.getElementById('select-mode');
-        const customSlugContainer = document.getElementById('custom-slug-container');
-        const inputCustomSlug = document.getElementById('input-custom-slug');
-
         function showToast(message) {
             let toast = document.createElement('div');
             toast.className = "fixed bottom-6 right-6 bg-slate-900 text-amber-400 font-bold px-4 py-2.5 rounded-xl shadow-lg border border-amber-500/20 text-xs transition-opacity duration-300 z-50 opacity-0";
@@ -604,131 +540,79 @@
             setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        function copyDonation() {
-            navigator.clipboard.writeText("brashridge65@walletofsatoshi.com").then(() => {
-                playAudio('click');
-                showToast(currentLang === 'en' ? "Address copied to clipboard!" : "アドレスをコピーしました！");
-            });
-        }
-        document.getElementById('btn-footer-donate').addEventListener('click', copyDonation);
-        document.getElementById('btn-footer-address').addEventListener('click', copyDonation);
-
-        langToggle.addEventListener('click', () => {
-            playAudio('click');
-            updateLanguage(currentLang === 'en' ? 'jp' : 'en');
-        });
-
-        soundToggle.addEventListener('click', () => {
-            soundEnabled = !soundEnabled;
-            soundIcon.className = soundEnabled ? "fa-solid fa-volume-high text-orange-500" : "fa-solid fa-volume-xmark text-slate-400";
-        });
-
-        selectMode.addEventListener('change', () => {
-            customSlugContainer.classList.toggle('hidden', selectMode.value !== 'custom');
-            playAudio('click');
-        });
-
-        function setMachineDisplay(text, colorClass = "text-amber-500") {
-            displayText.textContent = text;
-            displayText.className = `font-game text-xs tracking-widest glow-text-orange ${colorClass}`;
-        }
+        document.getElementById('btn-footer-donate').addEventListener('click', () => { navigator.clipboard.writeText("brashridge65@walletofsatoshi.com"); showToast(currentLang === 'en' ? "Address copied!" : "アドレスをコピーしました！"); playAudio('click'); });
+        document.getElementById('btn-footer-address').addEventListener('click', () => { navigator.clipboard.writeText("brashridge65@walletofsatoshi.com"); showToast(currentLang === 'en' ? "Address copied!" : "アドレスをコピーしました！"); playAudio('click'); });
+        document.getElementById('lang-toggle').addEventListener('click', () => { playAudio('click'); updateLanguage(currentLang === 'en' ? 'jp' : 'en'); });
+        document.getElementById('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; document.getElementById('sound-icon').className = soundEnabled ? "fa-solid fa-volume-high text-orange-500" : "fa-solid fa-volume-xmark text-slate-400"; });
+        document.getElementById('select-mode').addEventListener('change', () => { document.getElementById('custom-slug-container').classList.toggle('hidden', document.getElementById('select-mode').value !== 'custom'); playAudio('click'); });
 
         async function createInvoice() {
             const response = await fetch(`${LNBITS_URL}/api/v1/payments`, {
-                method: 'POST',
-                headers: { 'X-Api-Key': INVOICE_READ_KEY, 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'X-Api-Key': INVOICE_READ_KEY, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ out: false, amount: SPIN_AMOUNT, memo: "Ordinals Gashapon Spin", unit: "sat" })
             });
             if (!response.ok) throw new Error("API Failed");
-            const data = await response.json();
-            return { hash: data.payment_hash, invoice: data.payment_request };
+            const data = await response.json(); return { hash: data.payment_hash, invoice: data.payment_request };
         }
 
         async function checkInvoiceStatus(paymentHash) {
-            try {
-                const response = await fetch(`${LNBITS_URL}/api/v1/payments/${paymentHash}`, { headers: { 'X-Api-Key': INVOICE_READ_KEY } });
-                if (!response.ok) return false;
-                const data = await response.json(); return data.paid;
-            } catch (err) { return false; }
+            try { const response = await fetch(`${LNBITS_URL}/api/v1/payments/${paymentHash}`, { headers: { 'X-Api-Key': INVOICE_READ_KEY } }); if (!response.ok) return false; return (await response.json()).paid; } catch (err) { return false; }
         }
 
         function toggleModal(modal, show) {
-            if (show) {
-                modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10);
-            } else {
-                modal.classList.remove('opacity-100'); setTimeout(() => modal.classList.add('hidden'), 300);
-            }
+            if (show) { modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10); } 
+            else { modal.classList.remove('opacity-100'); setTimeout(() => modal.classList.add('hidden'), 300); }
         }
 
         function playGashaponRotation(seed) {
-            currentState = STATE.ROLLING;
-            playAudio('motor');
-            updateDisplayStateText();
-            gashaponMachine.classList.add('animate-shake');
-            crankHandle.style.transform = "rotate(720deg)";
-            crankHandle.style.transition = "transform 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
+            currentState = STATE.ROLLING; playAudio('motor'); updateDisplayStateText();
+            const machine = document.getElementById('gashapon-machine');
+            machine.classList.add('animate-shake');
+            document.getElementById('crank-handle').style.transform = "rotate(720deg)";
+            document.getElementById('crank-handle').style.transition = "transform 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
 
             setTimeout(() => {
-                gashaponMachine.classList.remove('animate-shake');
-                currentState = STATE.HAS_CAPSULE;
-                updateDisplayStateText();
-                playAudio('success');
-
-                dispensedCapsule.classList.remove('hidden');
-                dispensedCapsule.classList.add('animate-drop', 'capsule-glow');
-                dispensedCapsule.onclick = () => triggerReveal(seed);
+                machine.classList.remove('animate-shake'); currentState = STATE.HAS_CAPSULE; updateDisplayStateText(); playAudio('success');
+                const cap = document.getElementById('dispensed-capsule');
+                cap.classList.remove('hidden'); cap.classList.add('animate-drop', 'capsule-glow');
+                cap.onclick = () => triggerReveal(seed);
             }, 1500);
         }
 
-        let shuffleInterval = null;
-
+        // 開封・取得・ローディング処理
         async function triggerReveal(seed) {
             playAudio('pop');
 
-            let targetSlug = selectMode.value;
-            let hash = 0;
-            for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+            let targetSlug = document.getElementById('select-mode').value;
+            let hash = 0; for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
 
-            if (targetSlug === 'multiverse') {
-                targetSlug = CURATED_SLUGS[Math.abs(hash) % CURATED_SLUGS.length];
-            } else if (targetSlug === 'custom') {
-                targetSlug = inputCustomSlug.value.trim().toLowerCase() || "ordinal-mimi";
-            }
+            if (targetSlug === 'multiverse') targetSlug = CURATED_SLUGS[Math.abs(hash) % CURATED_SLUGS.length];
+            else if (targetSlug === 'custom') targetSlug = document.getElementById('input-custom-slug').value.trim().toLowerCase() || "ordinal-mimi";
 
-            // 🚀 スロット演出開始（チラつき完全防止）
-            const pImg = document.getElementById('prize-img');
-            document.getElementById('prize-name').textContent = currentLang === 'en' ? "MINTING / SHUFFLING..." : "ミント / シャッフル中...";
+            // 1. UIをローディング待機状態にセット
+            document.getElementById('prize-name').textContent = TRANSLATIONS[currentLang].loadingText;
             document.getElementById('prize-rarity').textContent = "#??????";
-            document.getElementById('prize-palette').textContent = targetSlug.toUpperCase();
-            document.getElementById('action-blocker').classList.remove('hidden'); // ボタン操作をブロック
+            document.getElementById('prize-palette').textContent = "...";
+            document.getElementById('action-blocker').classList.remove('hidden'); 
 
-            // アニメーション用のクラス初期化
-            pImg.classList.remove('fade-in');
-            pImg.style.opacity = '1';
+            // 画像非表示、可愛いローディング表示
+            const pImg = document.getElementById('prize-img');
+            const loader = document.getElementById('prize-img-loader');
+            pImg.classList.remove('opacity-100', 'scale-100');
+            pImg.classList.add('opacity-0', 'scale-95');
+            loader.classList.remove('hidden', 'opacity-0');
 
-            toggleModal(prizeModal, true);
+            toggleModal(document.getElementById('prize-modal'), true);
             currentState = STATE.REVEALED;
 
-            let shuffleIndex = 0;
-            if (shuffleInterval) clearInterval(shuffleInterval);
-            
-            // 事前キャッシュ済みの画像配列を使ってスムーズにシャッフル (120ms間隔)
-            const fallbackPool = preloadedImages.length > 0 ? preloadedImages : ["https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&q=80&w=600"];
-            pImg.src = fallbackPool[0];
-            
-            shuffleInterval = setInterval(() => {
-                shuffleIndex++;
-                pImg.src = fallbackPool[shuffleIndex % fallbackPool.length];
-            }, 120);
+            // 筐体をリセット
+            const cap = document.getElementById('dispensed-capsule');
+            cap.classList.add('hidden'); cap.classList.remove('animate-drop', 'capsule-glow');
+            document.getElementById('crank-handle').style.transform = "rotate(0deg)";
+            document.getElementById('crank-handle').style.transition = "none";
+            updateDisplayStateText();
 
-            // カプセルリセット
-            dispensedCapsule.classList.add('hidden');
-            dispensedCapsule.classList.remove('animate-drop', 'capsule-glow');
-            crankHandle.style.transform = "rotate(0deg)";
-            crankHandle.style.transition = "none";
-            setMachineDisplay("READY");
-
-            // 🚀 バックグラウンドでAPI通信（失敗時はダミーデータへフォールバック）
+            // 2. バックグラウンドでAPI取得（絶対にエラーで止めない）
             let inscriptionsList = [];
             try {
                 const response = await fetch(`https://turbo.ordinalswallet.com/collection/${targetSlug}/inscriptions`);
@@ -737,12 +621,12 @@
                 inscriptionsList = Array.isArray(data) ? data : (data.inscriptions || []);
                 if (inscriptionsList.length === 0) throw new Error("Empty Array");
             } catch (err) {
-                console.warn(`[API Fallback] Slug "${targetSlug}" is invalid or failed. Using fallback mock data.`);
-                // ⚠️ エラーで止めず、フォールバックデータで「必ず当たる」ようにする
-                inscriptionsList = SHUFFLE_IDS.map(id => ({
+                console.warn(`[API Fallback] API fetch for "${targetSlug}" failed. Generating safe fallback data.`);
+                // ⚠️ APIエラー時はフォールバックデータで「必ず当たる」ようにする
+                inscriptionsList = FALLBACK_IDS.map(id => ({
                     id: id,
                     num: Math.floor(Math.random() * 900000) + 100000,
-                    meta: { name: `${targetSlug.toUpperCase()} Mock #${Math.floor(Math.random() * 9999)}` }
+                    meta: { name: `${targetSlug.toUpperCase()} (Mock) #${Math.floor(Math.random() * 9999)}` }
                 }));
             }
 
@@ -753,56 +637,56 @@
             const wonItemNum = wonItem.num || wonItem.number || wonItem.inscription_number || wonItem.inscriptionNumber || "On-Chain";
             const wonItemName = (wonItem.meta && wonItem.meta.name) ? wonItem.meta.name : (`#${wonItemNum}`);
 
-            // 当選画像のロード完了＆最低演出時間を確保
             const finalRealImgUrl = `https://cdn.ordinalswallet.com/inscription/preview/${wonItemId}`;
             const preloaderImg = new Image();
-            preloaderImg.src = finalRealImgUrl;
             
             const startTime = Date.now();
 
+            // 3. 確定演出 (ローディングをフェードアウトし、画像をフェードイン)
             const finalizeReveal = () => {
-                clearInterval(shuffleInterval);
+                // ローディングを消す
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.classList.add('hidden'), 500); // CSS transition待ち
                 
-                // フワッとフェードイン演出
-                pImg.style.opacity = '0'; // 一瞬消す
-                setTimeout(() => {
-                    pImg.src = finalRealImgUrl;
-                    pImg.classList.add('fade-in'); // CSSアニメーションでフワッと表示
-                    
-                    document.getElementById('prize-name').textContent = wonItemName;
-                    document.getElementById('prize-rarity').textContent = `#${wonItemNum}`;
-                    document.getElementById('prize-palette').textContent = targetSlug.toUpperCase();
+                // 画像を表示する
+                pImg.src = finalRealImgUrl;
+                pImg.classList.remove('opacity-0', 'scale-95');
+                pImg.classList.add('opacity-100', 'scale-100');
+                
+                document.getElementById('prize-name').textContent = wonItemName;
+                document.getElementById('prize-rarity').textContent = `#${wonItemNum}`;
+                document.getElementById('prize-palette').textContent = targetSlug.toUpperCase();
 
-                    // ボタンの有効化
-                    document.getElementById('action-blocker').classList.add('hidden');
-                    document.getElementById('btn-explorer-link').href = `https://ordinals.com/inscription/${wonItemId}`;
-                    document.getElementById('btn-explorer-link').classList.remove('opacity-50', 'pointer-events-none');
-                    document.getElementById('btn-gamma-link').href = `https://gamma.io/inscription/${wonItemId}`;
-                    document.getElementById('btn-gamma-link').classList.remove('opacity-50', 'pointer-events-none');
-                    document.getElementById('btn-close-prize').classList.remove('opacity-50', 'pointer-events-none');
+                // ボタン有効化
+                document.getElementById('action-blocker').classList.add('hidden');
+                document.getElementById('btn-explorer-link').href = `https://ordinals.com/inscription/${wonItemId}`;
+                document.getElementById('btn-explorer-link').classList.remove('opacity-50', 'pointer-events-none');
+                document.getElementById('btn-gamma-link').href = `https://gamma.io/inscription/${wonItemId}`;
+                document.getElementById('btn-gamma-link').classList.remove('opacity-50', 'pointer-events-none');
+                document.getElementById('btn-close-prize').classList.remove('opacity-50', 'pointer-events-none');
 
-                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                    playAudio('success');
-                }, 50);
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                playAudio('success');
             };
 
             const checkAndFinalize = () => {
                 const elapsed = Date.now() - startTime;
-                const remaining = Math.max(0, 2000 - elapsed); // 最低2秒間は気持ちよくシャッフル
+                const remaining = Math.max(0, 2200 - elapsed); // 最低2.2秒は可愛いローディングを見せる
                 setTimeout(finalizeReveal, remaining);
             };
 
             preloaderImg.onload = checkAndFinalize;
-            preloaderImg.onerror = checkAndFinalize; // 読み込めなくても止めない
+            preloaderImg.onerror = checkAndFinalize; 
+            preloaderImg.src = finalRealImgUrl; // 読み込み開始
         }
 
-        btnCopyInvoice.onclick = async () => {
+        document.getElementById('btn-copy-invoice').onclick = async () => {
             try {
-                await navigator.clipboard.writeText(copyText.dataset.invoice);
-                const prevText = copyText.textContent;
-                copyText.textContent = TRANSLATIONS[currentLang].paymentCopySuccess;
+                await navigator.clipboard.writeText(document.getElementById('copy-text').dataset.invoice);
+                const pText = document.getElementById('copy-text').textContent;
+                document.getElementById('copy-text').textContent = TRANSLATIONS[currentLang].paymentCopySuccess;
                 playAudio('click');
-                setTimeout(() => copyText.textContent = prevText, 2000);
+                setTimeout(() => document.getElementById('copy-text').textContent = pText, 2000);
             } catch (err) { alert("Failed to copy address."); }
         };
 
@@ -810,23 +694,19 @@
             if (currentState === STATE.ROLLING || currentState === STATE.HAS_CAPSULE) {
                 alert(currentLang === 'en' ? "Please tap the dispensed capsule to open it first!" : "取り出し口のカプセルをタップして開封してください！"); return;
             }
-            if (selectMode.value === 'custom' && !inputCustomSlug.value.trim()) {
+            if (document.getElementById('select-mode').value === 'custom' && !document.getElementById('input-custom-slug').value.trim()) {
                 alert(currentLang === 'en' ? "Please enter an Ordinals collection slug." : "カスタムコレクションのSlugを入力してください。"); return;
             }
 
-            playAudio('click');
-            currentState = STATE.INVOICING; updateDisplayStateText();
-            toggleModal(paymentModal, true);
+            playAudio('click'); currentState = STATE.INVOICING; updateDisplayStateText();
+            toggleModal(document.getElementById('payment-modal'), true);
 
             try {
-                const invoiceData = await createInvoice();
-                activePaymentHash = invoiceData.hash;
-
-                qrcodeContainer.innerHTML = "";
-                new QRCode(qrcodeContainer, { text: invoiceData.invoice, width: 192, height: 192, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
-
-                lnkWallet.href = `lightning:${invoiceData.invoice}`;
-                copyText.dataset.invoice = invoiceData.invoice; // datasetに保存
+                const invoiceData = await createInvoice(); activePaymentHash = invoiceData.hash;
+                const qrContainer = document.getElementById('qrcode'); qrContainer.innerHTML = "";
+                new QRCode(qrContainer, { text: invoiceData.invoice, width: 192, height: 192, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+                document.getElementById('lnk-wallet').href = `lightning:${invoiceData.invoice}`;
+                document.getElementById('copy-text').dataset.invoice = invoiceData.invoice;
 
                 document.getElementById('payment-success-spinner').classList.add('hidden');
                 
@@ -834,47 +714,34 @@
                 pollInterval = setInterval(async () => {
                     const isPaid = await checkInvoiceStatus(activePaymentHash);
                     if (isPaid) {
-                        clearInterval(pollInterval);
-                        document.getElementById('payment-success-spinner').classList.remove('hidden');
-                        playAudio('success');
-                        setTimeout(() => { toggleModal(paymentModal, false); playGashaponRotation(activePaymentHash); }, 1200);
+                        clearInterval(pollInterval); document.getElementById('payment-success-spinner').classList.remove('hidden'); playAudio('success');
+                        setTimeout(() => { toggleModal(document.getElementById('payment-modal'), false); playGashaponRotation(activePaymentHash); }, 1200);
                     }
                 }, 2500);
             } catch (err) {
-                toggleModal(paymentModal, false);
-                currentState = STATE.IDLE; updateDisplayStateText();
+                toggleModal(document.getElementById('payment-modal'), false); currentState = STATE.IDLE; updateDisplayStateText();
             }
         }
 
-        function handleDemoPlay() {
-            if (currentState === STATE.ROLLING || currentState === STATE.HAS_CAPSULE) {
-                alert(currentLang === 'en' ? "Please open the capsule before testing again." : "カプセルを開封してから次のテストを行ってください。"); return;
-            }
-            playAudio('click');
-            const mockHash = "demo_hash_" + Math.random().toString(36).substring(2, 15);
-            playGashaponRotation(mockHash);
-        }
-
-        btnPlay.addEventListener('click', handleStartPay);
-        btnDemo.addEventListener('click', handleDemoPlay);
-        crankHandle.addEventListener('click', () => {
-            if (currentState === STATE.IDLE) handleStartPay();
-            else if (currentState === STATE.HAS_CAPSULE) alert(currentLang === 'en' ? "Please open the capsule first!" : "カプセルを開封してください！");
+        document.getElementById('btn-demo').addEventListener('click', () => {
+            if (currentState === STATE.ROLLING || currentState === STATE.HAS_CAPSULE) { alert(currentLang === 'en' ? "Please open the capsule before testing again." : "カプセルを開封してから次のテストを行ってください。"); return; }
+            playAudio('click'); playGashaponRotation("demo_hash_" + Math.random().toString(36).substring(2, 15));
         });
 
-        btnClosePayment.addEventListener('click', () => {
-            if (pollInterval) clearInterval(pollInterval);
-            toggleModal(paymentModal, false);
-            currentState = STATE.IDLE; updateDisplayStateText();
+        document.getElementById('btn-play').addEventListener('click', handleStartPay);
+        document.getElementById('crank-handle').addEventListener('click', () => {
+            if (currentState === STATE.IDLE) handleStartPay(); else if (currentState === STATE.HAS_CAPSULE) alert(currentLang === 'en' ? "Please open the capsule first!" : "カプセルを開封してください！");
+        });
+
+        document.getElementById('btn-close-payment').addEventListener('click', () => {
+            if (pollInterval) clearInterval(pollInterval); toggleModal(document.getElementById('payment-modal'), false); currentState = STATE.IDLE; updateDisplayStateText();
         });
         
-        btnClosePrize.addEventListener('click', () => {
-            if (shuffleInterval) clearInterval(shuffleInterval);
-            toggleModal(prizeModal, false);
-            dispensedCapsule.classList.add('hidden');
-            dispensedCapsule.classList.remove('animate-drop', 'capsule-glow');
+        document.getElementById('btn-close-prize').addEventListener('click', () => {
+            toggleModal(document.getElementById('prize-modal'), false);
+            const cap = document.getElementById('dispensed-capsule');
+            cap.classList.add('hidden'); cap.classList.remove('animate-drop', 'capsule-glow');
             
-            // ボタンのブロック状態をリセット
             document.getElementById('action-blocker').classList.remove('hidden');
             document.getElementById('btn-explorer-link').classList.add('opacity-50', 'pointer-events-none');
             document.getElementById('btn-gamma-link').classList.add('opacity-50', 'pointer-events-none');
