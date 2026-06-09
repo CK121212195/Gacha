@@ -42,15 +42,23 @@
         .animate-shake {
             animation: shake 0.6s ease-in-out infinite;
         }
-        /* カプセル降下アニメーション */
+        /* 【修正】カプセル降下アニメーション（取出口の中央でぴったり停止） */
         @keyframes drop {
-            0% { transform: translateY(-120px) scale(0.3) rotate(0deg); opacity: 0; }
-            50% { transform: translateY(40px) scale(1.1) rotate(180deg); opacity: 1; }
-            80% { transform: translateY(75px) scale(0.95) rotate(320deg); }
-            100% { transform: translateY(80px) scale(1) rotate(360deg); }
+            0% { transform: translateY(-70px) scale(0.3) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(5px) scale(1.1) rotate(180deg); opacity: 1; }
+            70% { transform: translateY(-5px) scale(0.95) rotate(270deg); }
+            100% { transform: translateY(0) scale(1) rotate(360deg); opacity: 1; }
         }
         .animate-drop {
-            animation: drop 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation: drop 1.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        /* 【追加】カプセル開封待機時のゴールドグロー点滅効果 */
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 15px rgba(247, 147, 26, 0.6), inset 0 0 8px rgba(255,255,255,0.4); }
+            50% { box-shadow: 0 0 30px rgba(247, 147, 26, 1), inset 0 0 15px rgba(255,255,255,0.8); }
+        }
+        .capsule-glow {
+            animation: pulse-gold 1.5s infinite;
         }
         /* 浮遊するカプセルのゆらぎ */
         @keyframes float {
@@ -128,7 +136,7 @@
                     <!-- 回転ハンドル -->
                     <div class="relative w-28 h-28 flex items-center justify-center">
                         <div id="crank-handle" class="w-24 h-24 bg-slate-900 border-4 border-slate-700 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:border-orange-500 active:scale-95 transition-all duration-200">
-                            <div class="w-20 h-6 bg-slate-700 rounded-full transform -rotate-45 relative">
+                            <div class="w-20 h-6 bg-slate-700 rounded-full transform -rotate-45 relative pointer-events-none">
                                 <div class="absolute left-1 top-1 w-4 h-4 bg-slate-500 rounded-full"></div>
                                 <div class="absolute right-1 top-1 w-4 h-4 bg-slate-500 rounded-full"></div>
                             </div>
@@ -139,13 +147,14 @@
 
                 <!-- 取出口 -->
                 <div class="relative w-full h-24 bg-slate-950 rounded-2xl mt-4 border border-slate-800 shadow-inner overflow-hidden flex justify-center items-center">
-                    <div class="absolute inset-0 bg-gradient-to-b from-black/80 to-transparent"></div>
-                    <div class="w-20 h-10 bg-slate-900/80 rounded-t-lg border-t border-slate-800"></div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/80 to-transparent pointer-events-none"></div>
+                    <div class="w-20 h-10 bg-slate-900/80 rounded-t-lg border-t border-slate-800 pointer-events-none"></div>
 
-                    <!-- 出てきたカプセル (初期状態は非表示) -->
-                    <div id="dispensed-capsule" class="absolute hidden w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-amber-600 border-2 border-white/40 shadow-xl cursor-pointer hover:scale-105 active:scale-95 transition-all duration-150 z-20 flex items-center justify-center">
+                    <!-- 【改善】出てきたカプセル：100%表示され、ピカピカ光ってタップを誘導します -->
+                    <div id="dispensed-capsule" class="absolute hidden w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-amber-600 border-2 border-white/40 shadow-xl cursor-pointer hover:scale-105 active:scale-95 transition-all duration-150 z-20 flex flex-col items-center justify-center">
                         <div class="absolute inset-x-0 h-0.5 bg-white/20 top-1/2 -translate-y-1/2"></div>
-                        <i class="fa-solid fa-gift text-white text-lg animate-pulse"></i>
+                        <i class="fa-solid fa-gift text-white text-base animate-pulse mb-1"></i>
+                        <span class="text-[8px] font-bold text-amber-300 font-game tracking-widest animate-pulse">TAP</span>
                     </div>
                 </div>
             </div>
@@ -669,9 +678,9 @@
                 setMachineDisplay("DISPENSED!", "text-emerald-400");
                 playAudio('success');
 
-                // カプセルの表示
+                // カプセルの表示 (落下およびグローエフェクトを追加)
                 dispensedCapsule.classList.remove('hidden');
-                dispensedCapsule.classList.add('animate-drop');
+                dispensedCapsule.classList.add('animate-drop', 'capsule-glow');
 
                 currentState = STATE.HAS_CAPSULE;
 
@@ -693,7 +702,7 @@
 
             // ガチャ筐体側のカプセルリセット
             dispensedCapsule.classList.add('hidden');
-            dispensedCapsule.classList.remove('animate-drop');
+            dispensedCapsule.classList.remove('animate-drop', 'capsule-glow');
             crankHandle.style.transform = "rotate(0deg)";
             crankHandle.style.transition = "none";
             setMachineDisplay("READY");
@@ -834,6 +843,9 @@
         });
         btnClosePrize.addEventListener('click', () => {
             toggleModal(prizeModal, false);
+            // カプセルの完全クリーンアップ
+            dispensedCapsule.classList.add('hidden');
+            dispensedCapsule.classList.remove('animate-drop', 'capsule-glow');
             currentState = STATE.IDLE;
         });
 
