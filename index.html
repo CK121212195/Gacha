@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIMI Gashapon - Bitcoin LN Powered</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0b0f19;
+        }
+        .font-game {
+            font-family: 'Orbitron', monospace;
+        }
+        /* ネオングロー効果 */
+        .glow-orange {
+            box-shadow: 0 0 20px rgba(247, 147, 26, 0.35);
+            border-color: rgba(247, 147, 26, 0.6);
+        }
+        .glow-text-orange {
+            text-shadow: 0 0 10px rgba(247, 147, 26, 0.6);
+        }
+        /* ガチャカプセル揺れアニメーション */
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            20%, 60% { transform: rotate(-5deg); }
+            40%, 80% { transform: rotate(5deg); }
+        }
+        .animate-shake {
+            animation: shake 0.6s ease-in-out infinite;
+        }
+        /* カプセル降下アニメーション */
+        @keyframes drop {
+            0% { transform: translateY(-120px) scale(0.3) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(40px) scale(1.1) rotate(180deg); opacity: 1; }
+            80% { transform: translateY(75px) scale(0.95) rotate(320deg); }
+            100% { transform: translateY(80px) scale(1) rotate(360deg); }
+        }
+        .animate-drop {
+            animation: drop 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        /* 浮遊するカプセルのゆらぎ */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
+        }
+        .capsule-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-orange-500/30">
+
+    <!-- ヘッダー -->
+    <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-r from-orange-500 to-amber-600 p-2.5 rounded-xl shadow-lg shadow-orange-500/20">
+                    <i class="fa-solid fa-cube text-xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-wider font-game text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-500">
+                        LN-MIMI GASHAPON
+                    </h1>
+                    <p class="text-xs text-slate-400">Micro-payment Digital Toy Machine</p>
+                </div>
+            </div>
+            <!-- 音声 & デモ切替 -->
+            <div class="flex items-center space-x-3 text-sm">
+                <button id="sound-toggle" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition flex items-center space-x-1">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-orange-400"></i>
+                    <span class="hidden sm:inline">SOUND</span>
+                </button>
+                <div class="hidden md:flex items-center space-x-1 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 text-xs text-slate-400">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
+                    Lightning Network Active
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8 items-center justify-center">
+        
+        <!-- 左側：ガシャポン筐体 -->
+        <div class="w-full lg:w-1/2 flex flex-col items-center">
+            <div id="gashapon-machine" class="relative w-72 sm:w-80 bg-slate-900 rounded-3xl p-6 border-4 border-slate-800 shadow-2xl flex flex-col items-center transition-all duration-300">
+                
+                <!-- ガラスドーム（カプセル室） -->
+                <div class="relative w-full h-56 bg-slate-950/80 rounded-2xl border-2 border-slate-700/50 overflow-hidden flex items-center justify-center shadow-inner">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none"></div>
+                    
+                    <!-- 浮遊するカプセル装飾 (CSS) -->
+                    <div class="absolute w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-700 border border-white/20 capsule-float top-8 left-6 shadow-lg"></div>
+                    <div class="absolute w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 border border-white/20 capsule-float top-16 right-8 shadow-lg" style="animation-delay: -1s;"></div>
+                    <div class="absolute w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 border border-white/20 capsule-float bottom-10 left-16 shadow-lg" style="animation-delay: -2s;"></div>
+                    <div class="absolute w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 border border-white/20 capsule-float bottom-16 right-16 shadow-lg" style="animation-delay: -1.5s;"></div>
+                    <div class="absolute w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-rose-700 border border-white/20 capsule-float top-24 left-24 shadow-lg" style="animation-delay: -3s;"></div>
+                    
+                    <!-- 電子ディスプレイ -->
+                    <div class="absolute top-3 px-3 py-1 rounded bg-black/90 border border-slate-800 text-center z-10 w-44">
+                        <span id="display-text" class="font-game text-xs text-orange-400 tracking-widest glow-text-orange">READY</span>
+                    </div>
+                </div>
+
+                <!-- 筐体中間部（コイン投入口とハンドル） -->
+                <div class="w-full bg-slate-800/60 rounded-xl p-4 mt-4 border border-slate-700/40 flex flex-col items-center">
+                    
+                    <!-- コイン・支払い価格表示 -->
+                    <div class="flex justify-between items-center w-full px-2 mb-3 text-xs tracking-wider">
+                        <span class="text-slate-400 font-game"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>PRICE</span>
+                        <span class="text-white font-game font-bold text-sm bg-slate-900 px-2 py-0.5 rounded-md border border-slate-700">10 SATS</span>
+                    </div>
+
+                    <!-- 回転ハンドル -->
+                    <div class="relative w-28 h-28 flex items-center justify-center">
+                        <div id="crank-handle" class="w-24 h-24 bg-slate-900 border-4 border-slate-700 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:border-orange-500 active:scale-95 transition-all duration-200">
+                            <div class="w-20 h-6 bg-slate-700 rounded-full transform -rotate-45 relative">
+                                <div class="absolute left-1 top-1 w-4 h-4 bg-slate-500 rounded-full"></div>
+                                <div class="absolute right-1 top-1 w-4 h-4 bg-slate-500 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-game mt-2 tracking-widest">TWIST HANDLE</span>
+                </div>
+
+                <!-- 取出口 -->
+                <div class="relative w-full h-24 bg-slate-950 rounded-2xl mt-4 border border-slate-800 shadow-inner overflow-hidden flex justify-center items-center">
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/80 to-transparent"></div>
+                    <div class="w-20 h-10 bg-slate-900/80 rounded-t-lg border-t border-slate-800"></div>
+
+                    <!-- 出てきたカプセル (初期状態は非表示) -->
+                    <div id="dispensed-capsule" class="absolute hidden w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-amber-600 border-2 border-white/40 shadow-xl cursor-pointer hover:scale-105 active:scale-95 transition-all duration-150 z-20 flex items-center justify-center">
+                        <div class="absolute inset-x-0 h-0.5 bg-white/20 top-1/2 -translate-y-1/2"></div>
+                        <i class="fa-solid fa-gift text-white text-lg animate-pulse"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：コンソール＆説明 -->
+        <div class="w-full lg:w-1/2 space-y-6">
+            <div class="bg-slate-900/60 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-6">
+                <div class="space-y-2">
+                    <div class="inline-flex items-center space-x-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 px-3 py-1 rounded-full text-xs font-semibold">
+                        <i class="fa-solid fa-bolt text-xs"></i>
+                        <span>LIGHTNING NETWORK PAYMENTS</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+                        Bitcoinで回す<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-500">MIMI ジェネラティブガチャ</span>
+                    </h2>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        1回 <strong>10 sats</strong> を支払うことで、日本の有名デジタルアーティスト OTO氏が手掛けたBitcoinオンチェーンアートコレクション「Ordinal MIMI」のミニマルな幾何学美学をオマージュした、あなただけのデジタルMIMIをその場で自動生成（ミント）します。
+                    </p>
+                </div>
+
+                <!-- アクションエリア -->
+                <div class="p-4 bg-slate-950/60 rounded-2xl border border-slate-800 flex flex-col space-y-3">
+                    <button id="btn-play" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-game font-bold py-4 px-6 rounded-xl shadow-lg shadow-orange-500/20 active:scale-[0.99] transition duration-150 text-base tracking-wider flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-play"></i>
+                        <span>10 SATS でガチャを回す</span>
+                    </button>
+                    <!-- フリーデモ機能 -->
+                    <button id="btn-demo" class="text-xs text-slate-500 hover:text-slate-300 transition text-center underline font-game">
+                        FREE PLAY DEMO (テスト用・無料)
+                    </button>
+                </div>
+
+                <!-- 遊び方の簡単な流れ -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2">
+                    <div class="p-3 bg-slate-800/30 rounded-xl border border-slate-800/50 space-y-1">
+                        <div class="text-orange-400 font-bold font-game">01. REQUEST</div>
+                        <p class="text-slate-400">ボタンを押し、LN支払いのインボイスを発行します。</p>
+                    </div>
+                    <div class="p-3 bg-slate-800/30 rounded-xl border border-slate-800/50 space-y-1">
+                        <div class="text-orange-400 font-bold font-game">02. SEND SATS</div>
+                        <p class="text-slate-400">QRコードを任意のLNウォレットで読み取り支払います。</p>
+                    </div>
+                    <div class="p-3 bg-slate-800/30 rounded-xl border border-slate-800/50 space-y-1">
+                        <div class="text-orange-400 font-bold font-game">03. GENERATE</div>
+                        <p class="text-slate-400">決済完了後、ガチャが回りMIMIアートを獲得できます。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- インボイス支払い用モーダル -->
+    <div id="payment-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all duration-300 opacity-0">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative space-y-6">
+            <!-- 閉じるボタン -->
+            <button id="btn-close-payment" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center space-y-1">
+                <h3 class="text-lg font-bold font-game tracking-wider">PAY LIGHTNING INVOICE</h3>
+                <p class="text-xs text-slate-400">ガシャポンを動かすために10satsを送金してください</p>
+            </div>
+
+            <!-- QRコード表示エリア -->
+            <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-lg relative overflow-hidden">
+                <div id="qrcode"></div>
+                <!-- 支払検知時のローディング・オーバーレイ -->
+                <div id="payment-success-spinner" class="absolute inset-0 bg-emerald-500/90 flex flex-col items-center justify-center text-white space-y-2 hidden">
+                    <i class="fa-solid fa-circle-check text-4xl animate-bounce"></i>
+                    <span class="font-game font-bold text-sm">PAID SUCCESS!</span>
+                </div>
+            </div>
+
+            <!-- ウォレット起動 & コピー -->
+            <div class="space-y-2">
+                <a id="lnk-wallet" href="#" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 block shadow-md shadow-orange-500/10">
+                    <i class="fa-solid fa-wallet mr-1"></i>ウォレットを起動する
+                </a>
+                <button id="btn-copy-invoice" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 px-4 rounded-xl text-xs transition duration-150 flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-copy"></i>
+                    <span id="copy-text">インボイス文字列をコピー</span>
+                </button>
+            </div>
+
+            <!-- ステータス表示 -->
+            <div class="flex items-center justify-center space-x-2 text-xs text-slate-400">
+                <div class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></div>
+                <span>支払いの確認を待機しています...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品獲得モーダル -->
+    <div id="prize-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all duration-300 opacity-0">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl relative flex flex-col items-center space-y-6">
+            
+            <div class="text-center space-y-1">
+                <div class="text-xs text-amber-500 font-game font-bold tracking-widest uppercase">✨ Capsule Opened ✨</div>
+                <h3 id="prize-name" class="text-xl font-black font-game tracking-wider">MIMI #000</h3>
+            </div>
+
+            <!-- ジェネラティブアート描画キャンバス -->
+            <div class="relative group">
+                <div class="absolute -inset-1.5 bg-gradient-to-r from-orange-500 to-amber-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                <canvas id="mimi-canvas" width="320" height="320" class="relative bg-slate-950 rounded-xl shadow-2xl w-72 h-72 sm:w-80 sm:h-80 border-4 border-slate-900"></canvas>
+            </div>
+
+            <!-- ステータス/レア度 -->
+            <div class="grid grid-cols-2 gap-4 w-full max-w-xs text-xs">
+                <div class="bg-slate-800/50 p-2.5 rounded-xl border border-slate-800 text-center">
+                    <span class="text-slate-400 block mb-0.5">RARITY</span>
+                    <span id="prize-rarity" class="font-bold font-game text-orange-400">COMMON</span>
+                </div>
+                <div class="bg-slate-800/50 p-2.5 rounded-xl border border-slate-800 text-center">
+                    <span class="text-slate-400 block mb-0.5">PALETTE</span>
+                    <span id="prize-palette" class="font-bold font-game text-slate-200">Bitcoin Sunset</span>
+                </div>
+            </div>
+
+            <!-- 操作 -->
+            <div class="w-full max-w-xs space-y-2">
+                <button id="btn-save-image" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-download"></i>
+                    <span>画像を保存する (PNG)</span>
+                </button>
+                <div class="flex gap-2">
+                    <button id="btn-close-prize" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 px-4 rounded-xl text-xs transition duration-150">
+                        閉じる
+                    </button>
+                    <a href="https://gamma.io/ordinals/collections/ordinal-mimi/items" target="_blank" rel="noopener noreferrer" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 px-4 rounded-xl text-xs transition duration-150 flex items-center justify-center space-x-1">
+                        <span>公式Gamma</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フッター & 公式ショーケース -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-8">
+        <div class="max-w-4xl mx-auto px-4 space-y-6 text-center">
+            
+            <!-- オリジナルコレクションの紹介 -->
+            <div class="bg-slate-900/40 p-6 rounded-2xl border border-slate-800/80 max-w-2xl mx-auto space-y-3">
+                <h4 class="text-sm font-bold font-game tracking-widest text-slate-300">ABOUT ORIGINAL "ORDINAL MIMI"</h4>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    本家「Ordinal MIMI」は、ビットコイン・ブロックチェーン上に永続的に刻まれた333点の1/1限定オンチェーンミニマリズムコレクションです。当ガシャポンシステムは、そのデザイン理念（幾何学・シンプルアイズ・カラーコントラスト）を賛美し、生成モデルとして楽しむために実装されたオマージュサイトです。
+                </p>
+                <a href="https://gamma.io/ordinals/collections/ordinal-mimi/items" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-xs text-orange-400 hover:text-orange-300 transition space-x-1">
+                    <span>Gamma.ioで公式コレクションを見る</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <p class="text-[10px] text-slate-600 font-game">
+                © 2026 MIMI Gashapon. Built with LNbits Web API. No admin privileges required.
+            </p>
+        </div>
+    </footer>
+
+    <!-- 💡 ロジック制御スクリプト -->
+    <script>
+        // ------------------------------------
+        // ⚙️ 設定 (LNbits Credentials)
+        // ------------------------------------
+        const LNBITS_URL = "https://demo.lnbits.com";
+        const INVOICE_READ_KEY = "67e5b0ad270f44d19e6d768bb3314e49";
+        const SPIN_AMOUNT = 10; // sats
+
+        // 状態定義
+        const STATE = {
+            IDLE: "idle",
+            INVOICING: "invoicing",
+            PENDING: "pending",
+            ROLLING: "rolling",
+            HAS_CAPSULE: "has_capsule",
+            REVEALED: "revealed"
+        };
+        let currentState = STATE.IDLE;
+        let pollInterval = null;
+        let activePaymentHash = null;
+        let soundEnabled = true;
+
+        // 音声設定 (Web Audio API を使った即時シンセサイザー音源)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playAudio(type) {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else if (type === 'motor') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(60, now + 1.2);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 1.2);
+                    osc.start(now); osc.stop(now + 1.2);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now); osc.stop(now + 0.4);
+                } else if (type === 'pop') {
+                    osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.exponentialRampToValueAtTime(1000, now + 0.15);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                }
+            } catch (e) {
+                console.warn("Audio error: ", e);
+            }
+        }
+
+        // DOMの取得
+        const btnPlay = document.getElementById('btn-play');
+        const btnDemo = document.getElementById('btn-demo');
+        const paymentModal = document.getElementById('payment-modal');
+        const prizeModal = document.getElementById('prize-modal');
+        const qrcodeContainer = document.getElementById('qrcode');
+        const copyText = document.getElementById('copy-text');
+        const btnCopyInvoice = document.getElementById('btn-copy-invoice');
+        const lnkWallet = document.getElementById('lnk-wallet');
+        const btnClosePayment = document.getElementById('btn-close-payment');
+        const btnClosePrize = document.getElementById('btn-close-prize');
+        const btnSaveImage = document.getElementById('btn-save-image');
+        const soundToggle = document.getElementById('sound-toggle');
+        const soundIcon = document.getElementById('sound-icon');
+        
+        const gashaponMachine = document.getElementById('gashapon-machine');
+        const crankHandle = document.getElementById('crank-handle');
+        const dispensedCapsule = document.getElementById('dispensed-capsule');
+        const displayText = document.getElementById('display-text');
+
+        // 音声切替
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            if (soundEnabled) {
+                soundIcon.className = "fa-solid fa-volume-high text-orange-400";
+            } else {
+                soundIcon.className = "fa-solid fa-volume-xmark text-slate-500";
+            }
+        });
+
+        // 状態遷移：表示更新
+        function setMachineDisplay(text, colorClass = "text-orange-400") {
+            displayText.textContent = text;
+            displayText.className = `font-game text-xs tracking-widest glow-text-orange ${colorClass}`;
+        }
+
+        // ------------------------------------
+        // 💸 Lightning Network API 処理 (LNbits)
+        // ------------------------------------
+
+        // インボイスの発行 (POST)
+        async function createInvoice() {
+            try {
+                const response = await fetch(`${LNBITS_URL}/api/v1/payments`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Api-Key': INVOICE_READ_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        out: false,
+                        amount: SPIN_AMOUNT,
+                        memo: "MIMI Gashapon Spin",
+                        unit: "sat"
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Connection Failed");
+                const data = await response.json();
+                return {
+                    hash: data.payment_hash,
+                    invoice: data.payment_request
+                };
+            } catch (err) {
+                console.error(err);
+                alert("インボイスの発行に失敗しました。LNbitsインスタンスまたはAPIキーを確認してください。");
+                throw err;
+            }
+        }
+
+        // 支払状況のポーリング (GET)
+        async function checkInvoiceStatus(paymentHash) {
+            try {
+                const response = await fetch(`${LNBITS_URL}/api/v1/payments/${paymentHash}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Api-Key': INVOICE_READ_KEY
+                    }
+                });
+                if (!response.ok) return false;
+                const data = await response.json();
+                return data.paid;
+            } catch (err) {
+                console.warn("Polling error:", err);
+                return false;
+            }
+        }
+
+        // ------------------------------------
+        // 🎨 MIMI風 ジェネラティブキャンバス描画ロジック
+        // ------------------------------------
+        function generateMimiArt(seed) {
+            const canvas = document.getElementById('mimi-canvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // シード値（支払いハッシュなど）から乱数を一意に生成
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) {
+                hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const getRand = (min, max, offset = 0) => {
+                const x = Math.sin(hash + offset) * 10000;
+                return min + Math.floor((x - Math.floor(x)) * (max - min + 1));
+            };
+
+            // 1. カラーパレット決定 (幾何学・オマージュ美学に即した構成)
+            const palettes = [
+                { name: "Bitcoin Gold", bg: "#F7931A", shapes: ["#1e293b", "#fef08a", "#ffffff"] },
+                { name: "Cyber Tokyo", bg: "#7000FF", shapes: ["#00F5D4", "#ff007f", "#ffffff"] },
+                { name: "Monolith Slate", bg: "#0f172a", shapes: ["#f43f5e", "#10b981", "#ffffff"] },
+                { name: "Retro Orange", bg: "#ea580c", shapes: ["#172554", "#fcd34d", "#ffffff"] },
+                { name: "Nippon Red", bg: "#ffffff", shapes: ["#e11d48", "#111827", "#9ca3af"] },
+                { name: "Starry Void", bg: "#030712", shapes: ["#fbbf24", "#4f46e5", "#ffffff"] }
+            ];
+            
+            const palIdx = Math.abs(hash) % palettes.length;
+            const pal = palettes[palIdx];
+
+            // 背景描画
+            ctx.fillStyle = pal.bg;
+            ctx.fillRect(0, 0, w, h);
+
+            // 2. 幾何学的ベース（中央・背後を飾るミニマリズムシェイプ）
+            ctx.fillStyle = pal.shapes[0];
+            const baseShape = getRand(0, 2, 1);
+            if (baseShape === 0) {
+                // 中央寄りのモノリス/矩形
+                ctx.fillRect(getRand(40, 100, 2), 0, getRand(120, 240, 3), h);
+            } else if (baseShape === 1) {
+                // 大きなサークル
+                ctx.beginPath();
+                ctx.arc(getRand(100, 220, 4), getRand(100, 220, 5), getRand(80, 140, 6), 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // 巨大な対角三角形
+                ctx.beginPath();
+                ctx.moveTo(getRand(0, 100, 7), h);
+                ctx.lineTo(getRand(160, 320, 8), getRand(0, 120, 9));
+                ctx.lineTo(getRand(220, 320, 10), h);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // 二次レイヤーシェイプ
+            ctx.fillStyle = pal.shapes[1];
+            if (getRand(0, 1, 11) === 1) {
+                ctx.fillRect(getRand(0, 180, 12), getRand(150, 280, 13), getRand(80, 160, 14), getRand(30, 80, 15));
+            } else {
+                ctx.beginPath();
+                ctx.arc(getRand(180, 280, 16), getRand(40, 120, 17), getRand(30, 60, 18), 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 3. キャラクターフェイスベース (モノクロやコントラストのはっきりした顔枠)
+            ctx.fillStyle = pal.shapes[2];
+            const headW = 140;
+            const headH = 140;
+            const headX = (w / 2) - (headW / 2);
+            const headY = (h / 2) - (headH / 2);
+            ctx.fillRect(headX, headY, headW, headH);
+
+            // 4. MIMIの象徴：幾何学的な瞳 (Simple Blocky Eyes)
+            ctx.fillStyle = pal.bg; // 背景色でくり抜く
+            const eyeSize = 30;
+            const eyeY = headY + 40;
+            const leftEyeX = headX + 20;
+            const rightEyeX = headX + headW - 20 - eyeSize;
+
+            const eyeType = getRand(0, 3, 19);
+            if (eyeType === 0) {
+                // ピクセルスクエア型
+                ctx.fillRect(leftEyeX, eyeY, eyeSize, eyeSize);
+                ctx.fillRect(rightEyeX, eyeY, eyeSize, eyeSize);
+                // 虹彩/インサイドブラック
+                ctx.fillStyle = pal.shapes[0];
+                ctx.fillRect(leftEyeX + 8, eyeY + 8, 14, 14);
+                ctx.fillRect(rightEyeX + 8, eyeY + 8, 14, 14);
+            } else if (eyeType === 1) {
+                // 円形ターゲット型
+                ctx.beginPath();
+                ctx.arc(leftEyeX + eyeSize/2, eyeY + eyeSize/2, eyeSize/2, 0, Math.PI * 2);
+                ctx.arc(rightEyeX + eyeSize/2, eyeY + eyeSize/2, eyeSize/2, 0, Math.PI * 2);
+                ctx.fill();
+                // 中
+                ctx.fillStyle = pal.shapes[0];
+                ctx.beginPath();
+                ctx.arc(leftEyeX + eyeSize/2, eyeY + eyeSize/2, eyeSize/4, 0, Math.PI * 2);
+                ctx.arc(rightEyeX + eyeSize/2, eyeY + eyeSize/2, eyeSize/4, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (eyeType === 2) {
+                // スリープライン型 (横線)
+                ctx.strokeStyle = pal.shapes[0];
+                ctx.lineWidth = 8;
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(leftEyeX, eyeY + 15);
+                ctx.lineTo(leftEyeX + eyeSize, eyeY + 15);
+                ctx.moveTo(rightEyeX, eyeY + 15);
+                ctx.lineTo(rightEyeX + eyeSize, eyeY + 15);
+                ctx.stroke();
+            } else {
+                // サイバーゴーグル/バイザー風
+                ctx.fillStyle = "#FF0055"; // ネオンレッド
+                ctx.fillRect(headX + 12, eyeY, headW - 24, eyeSize);
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(headX + 20, eyeY + 4, 30, 6);
+            }
+
+            // 5. 特徴・アクセサリー（レーザービーム等）
+            const accType = getRand(0, 3, 20);
+            if (accType === 0 && eyeType !== 2) {
+                // レーザービーム！ (Bitcoinファンアートの定番)
+                ctx.strokeStyle = "#ff003c";
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(leftEyeX + eyeSize/2, eyeY + eyeSize/2);
+                ctx.lineTo(0, h);
+                ctx.moveTo(rightEyeX + eyeSize/2, eyeY + eyeSize/2);
+                ctx.lineTo(w, h);
+                ctx.stroke();
+            } else if (accType === 1) {
+                // 小さな幾何学マウス
+                ctx.fillStyle = pal.shapes[0];
+                ctx.fillRect(w/2 - 10, headY + 105, 20, 8);
+            } else if (accType === 2) {
+                // チークピンクサークル
+                ctx.fillStyle = "#ffa3a3";
+                ctx.beginPath();
+                ctx.arc(leftEyeX + eyeSize/2 - 5, eyeY + eyeSize + 15, 8, 0, Math.PI * 2);
+                ctx.arc(rightEyeX + eyeSize/2 + 5, eyeY + eyeSize + 15, 8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // レトロオンチェーンフレーム
+            ctx.strokeStyle = "rgba(255,255,255,0.15)";
+            ctx.lineWidth = 12;
+            ctx.strokeRect(6, 6, w - 12, h - 12);
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(12, 12, w - 24, h - 24);
+
+            // メタデータ生成用返り値
+            const rarities = ["COMMON", "RARE", "EPIC", "MYTHIC"];
+            const rVal = getRand(0, 100, 21);
+            let rarity = rarities[0];
+            if (rVal > 95) rarity = rarities[3];
+            else if (rVal > 80) rarity = rarities[2];
+            else if (rVal > 55) rarity = rarities[1];
+
+            return {
+                paletteName: pal.name,
+                rarity: rarity,
+                serial: Math.abs(hash) % 333
+            };
+        }
+
+        // ------------------------------------
+        // 🎮 ガシャポン・ゲームフロー制御
+        // ------------------------------------
+
+        // モーダルの表示切替
+        function toggleModal(modal, show) {
+            if (show) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.add('opacity-100');
+                }, 10);
+            } else {
+                modal.classList.remove('opacity-100');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // ガシャポンの物理的な回転演出
+        function playGashaponRotation(seed) {
+            currentState = STATE.ROLLING;
+            playAudio('motor');
+            
+            setMachineDisplay("SPINNING...", "text-yellow-400");
+            gashaponMachine.classList.add('animate-shake');
+            crankHandle.style.transform = "rotate(720deg)";
+            crankHandle.style.transition = "transform 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
+
+            // 1.5秒後、カプセルを物理的に投下
+            setTimeout(() => {
+                gashaponMachine.classList.remove('animate-shake');
+                setMachineDisplay("DISPENSED!", "text-emerald-400");
+                playAudio('success');
+
+                // カプセルの表示
+                dispensedCapsule.classList.remove('hidden');
+                dispensedCapsule.classList.add('animate-drop');
+
+                currentState = STATE.HAS_CAPSULE;
+
+                // カプセル開封アクションの紐付け
+                dispensedCapsule.onclick = () => {
+                    triggerReveal(seed);
+                };
+            }, 1500);
+        }
+
+        // カプセル開封＆景品ミント画面
+        function triggerReveal(seed) {
+            playAudio('pop');
+            confetti({
+                particleCount: 120,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            // ガチャ筐体側のカプセルリセット
+            dispensedCapsule.classList.add('hidden');
+            dispensedCapsule.classList.remove('animate-drop');
+            crankHandle.style.transform = "rotate(0deg)";
+            crankHandle.style.transition = "none";
+            setMachineDisplay("READY");
+
+            // ジェネラティブキャンバス描画実行
+            const metadata = generateMimiArt(seed);
+
+            // モーダル文字埋め込み
+            document.getElementById('prize-name').textContent = `Ordinal MIMI #${String(metadata.serial).padStart(3, '0')}`;
+            document.getElementById('prize-palette').textContent = metadata.paletteName;
+            
+            const rEl = document.getElementById('prize-rarity');
+            rEl.textContent = metadata.rarity;
+            if (metadata.rarity === "MYTHIC") {
+                rEl.className = "font-bold font-game text-yellow-400 animate-pulse";
+            } else if (metadata.rarity === "EPIC") {
+                rEl.className = "font-bold font-game text-purple-400";
+            } else if (metadata.rarity === "RARE") {
+                rEl.className = "font-bold font-game text-cyan-400";
+            } else {
+                rEl.className = "font-bold font-game text-slate-400";
+            }
+
+            // 画像保存ボタンロジックの紐付け
+            btnSaveImage.onclick = () => {
+                const canvas = document.getElementById('mimi-canvas');
+                const link = document.createElement('a');
+                link.download = `MIMI_Inscribed_${metadata.serial}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+
+            // 景品モーダル表示
+            toggleModal(prizeModal, true);
+            currentState = STATE.REVEALED;
+        }
+
+        // コピー機能
+        function setupClipboard(text) {
+            btnCopyInvoice.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    copyText.textContent = "コピー完了！";
+                    playAudio('click');
+                    setTimeout(() => {
+                        copyText.textContent = "インボイス文字列をコピー";
+                    }, 2000);
+                } catch (err) {
+                    alert("コピーに失敗しました。お使いのブラウザ設定を確認してください。");
+                }
+            };
+        }
+
+        // ガチャボタン押下時
+        async function handleStartPay() {
+            if (currentState === STATE.ROLLING || currentState === STATE.HAS_CAPSULE) {
+                alert("取り出し口にあるカプセルを先にタップして開封してください！");
+                return;
+            }
+
+            playAudio('click');
+            setMachineDisplay("INVOICING...", "text-slate-500");
+            toggleModal(paymentModal, true);
+
+            try {
+                // 1. LNbitsからインボイス獲得
+                const invoiceData = await createInvoice();
+                activePaymentHash = invoiceData.hash;
+
+                // 2. QRコードレンダリング
+                qrcodeContainer.innerHTML = "";
+                new QRCode(qrcodeContainer, {
+                    text: invoiceData.invoice,
+                    width: 192,
+                    height: 192,
+                    colorDark: "#0b0f19",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+
+                // インボイスリンク・コピー設定
+                lnkWallet.href = `lightning:${invoiceData.invoice}`;
+                setupClipboard(invoiceData.invoice);
+
+                // 3. ポーリング開始
+                document.getElementById('payment-success-spinner').classList.add('hidden');
+                
+                if (pollInterval) clearInterval(pollInterval);
+                pollInterval = setInterval(async () => {
+                    const isPaid = await checkInvoiceStatus(activePaymentHash);
+                    if (isPaid) {
+                        // 支払完了検知
+                        clearInterval(pollInterval);
+                        document.getElementById('payment-success-spinner').classList.remove('hidden');
+                        playAudio('success');
+
+                        setTimeout(() => {
+                            toggleModal(paymentModal, false);
+                            playGashaponRotation(activePaymentHash);
+                        }, 1200);
+                    }
+                }, 2500); // 2.5秒おきに支払チェック
+
+            } catch (err) {
+                toggleModal(paymentModal, false);
+                setMachineDisplay("READY");
+            }
+        }
+
+        // テスト用：支払いをバイパスして回すデモモード
+        function handleDemoPlay() {
+            if (currentState === STATE.ROLLING || currentState === STATE.HAS_CAPSULE) {
+                alert("カプセルを開封してから次のテストを行ってください。");
+                return;
+            }
+            playAudio('click');
+            // 適当なダミーハッシュ
+            const mockHash = "demo_hash_" + Math.random().toString(36).substring(2, 15);
+            playGashaponRotation(mockHash);
+        }
+
+        // イベントバインド
+        btnPlay.addEventListener('click', handleStartPay);
+        btnDemo.addEventListener('click', handleDemoPlay);
+        crankHandle.addEventListener('click', () => {
+            if (currentState === STATE.IDLE) {
+                handleStartPay();
+            } else if (currentState === STATE.HAS_CAPSULE) {
+                alert("カプセルを開封してください！");
+            }
+        });
+
+        // モーダルを閉じる処理
+        btnClosePayment.addEventListener('click', () => {
+            if (pollInterval) clearInterval(pollInterval);
+            toggleModal(paymentModal, false);
+            setMachineDisplay("READY");
+        });
+        btnClosePrize.addEventListener('click', () => {
+            toggleModal(prizeModal, false);
+            currentState = STATE.IDLE;
+        });
+
+    </script>
+</body>
+</html>
