@@ -83,7 +83,6 @@
         .capsule-glow {
             animation: pulse-gold 1.5s infinite;
         }
-        /* スムーズなフェードトランジション用 */
         .fade-transition {
             transition: opacity 0.6s ease-in-out, transform 0.6s ease-out;
         }
@@ -138,7 +137,8 @@
                 <div class="w-full bg-amber-50/60 rounded-2xl p-4 mt-4 border border-amber-200/60 flex flex-col items-center">
                     <div class="flex justify-between items-center w-full px-2 mb-3 text-xs tracking-wider font-bold">
                         <span id="price-label" class="text-slate-500 font-game"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>PRICE</span>
-                        <span class="text-orange-600 font-game font-black text-sm bg-orange-100/60 px-2 py-0.5 rounded-md border border-orange-200">300 SATS</span>
+                        <!-- 価格表示バッジ (無料時は切り替わる) -->
+                        <span id="price-badge" class="text-emerald-600 font-game font-black text-sm bg-emerald-100/60 px-2 py-0.5 rounded-md border border-emerald-200 transition-all">FREE</span>
                     </div>
 
                     <div class="relative w-28 h-28 flex items-center justify-center">
@@ -177,10 +177,11 @@
                         Bitcoin Ordinals Gashapon<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-600">Multiverse Edition</span>
                     </h2>
                     <p id="main-desc" class="text-sm text-slate-600 leading-relaxed font-medium">
-                        Spend 300 sats to randomly draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!
+                        Draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!
                     </p>
                 </div>
 
+                <!-- コレクション選択・カスタムSlug入力パネル -->
                 <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/60 space-y-3">
                     <label id="label-mode" class="text-xs font-black text-slate-500 font-game block"><i class="fa-solid fa-sliders mr-1 text-orange-500"></i>SELECT GASHAPON MODE</label>
                     <select id="select-mode" class="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-slate-700 font-medium focus:outline-none focus:border-orange-500 shadow-sm">
@@ -189,9 +190,7 @@
                         <option value="bitcoin-frogs">🐸 Bitcoin Frogs</option>
                         <option value="nodemonkes">🐒 NodeMonkes</option>
                         <option value="bitcoin-puppets">🧸 Bitcoin Puppets</option>
-                        <option value="bitcoin-punks">👤 Bitcoin Punks</option>
                         <option value="bitcoin-monkes">🦍 Bitcoin Monkes</option>
-                        <!-- 修正: very-long-pepes -->
                         <option value="very-long-pepes">🐸 VeryLongPepes</option>
                         <option value="anons">🎭 Anons</option>
                         <option value="custom">✍️ Custom Slug...</option>
@@ -203,13 +202,21 @@
                     </div>
                 </div>
 
+                <!-- 🌟 価格設定スライダー (4回目以降に表示) -->
+                <div id="slider-container" class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/60 space-y-3 hidden">
+                    <div class="flex justify-between items-center">
+                        <label id="label-amount" class="text-xs font-black text-slate-500 font-game block"><i class="fa-solid fa-coins mr-1 text-orange-500"></i>SET AMOUNT (SATS)</label>
+                        <span id="slider-value-display" class="font-game font-bold text-orange-600 text-sm">300 SATS</span>
+                    </div>
+                    <input type="range" id="price-slider" min="300" max="10000" step="100" value="300" class="w-full accent-orange-500 cursor-pointer">
+                    <p id="slider-helper" class="text-[9px] text-slate-400 font-medium leading-relaxed">*You can freely set the amount to pay (300 - 10000 sats).</p>
+                </div>
+
+                <!-- アクションエリア -->
                 <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/60 flex flex-col space-y-3">
                     <button id="btn-play" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-game font-bold py-4 px-6 rounded-xl shadow-lg shadow-orange-500/10 active:scale-[0.99] transition duration-150 text-base tracking-wider flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-play"></i>
-                        <span id="btn-play-text">SPIN GASHAPON FOR 300 SATS</span>
-                    </button>
-                    <button id="btn-demo" class="text-xs text-slate-400 hover:text-slate-600 transition text-center underline font-game font-bold">
-                        FREE PLAY DEMO (Test Mode)
+                        <span id="btn-play-text">FREE SPIN (3 LEFT)</span>
                     </button>
                 </div>
             </div>
@@ -224,7 +231,7 @@
             </button>
             <div class="text-center space-y-1">
                 <h3 id="payment-header" class="text-lg font-black font-game tracking-wider text-slate-800">PAY LIGHTNING INVOICE</h3>
-                <p id="payment-sub" class="text-xs text-slate-500 font-medium">Please send 300 sats to spin the Gashapon</p>
+                <p id="payment-sub" class="text-xs text-slate-500 font-medium">Please send sats to spin the Gashapon</p>
             </div>
             <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner border border-slate-100 relative overflow-hidden">
                 <div id="qrcode"></div>
@@ -338,7 +345,6 @@
     <script>
         const LNBITS_URL = "https://demo.lnbits.com";
         const INVOICE_READ_KEY = "67e5b0ad270f44d19e6d768bb3314e49";
-        const SPIN_AMOUNT = 300; 
 
         const STATE = { IDLE: "idle", INVOICING: "invoicing", PENDING: "pending", ROLLING: "rolling", HAS_CAPSULE: "has_capsule", REVEALED: "revealed" };
         let currentState = STATE.IDLE;
@@ -347,14 +353,15 @@
         let soundEnabled = true;
         let currentLang = 'en';
 
-        // 修正: very-long-pepes に変更
+        // 🌟 初回3回無料用の変数
+        let freeSpinsLeft = 3;
+
         const CURATED_SLUGS = [
             "ordinal-mimi", "bitcoin-frogs", "nodemonkes", "bitcoin-puppets",
-            "bitcoin-punks", "bitcoin-monkes", "very-long-pepes", "anons"
+            "bitcoin-monkes", "very-long-pepes", "anons"
         ];
 
         // 🌟 API失敗時用のフォールバック（緊急用モック）データリスト
-        // これにより、取得に失敗してもエラーで止まることなく、本物のOrdinals画像を必ず提供します
         const FALLBACK_IDS = [
             "0dfa3a9366e6c466472f8888bf409976fc2713fa432c4dccf2f64485522c3ci0",
             "0256dbe126742512684ab33a201c13bfda63fc50486a4e32d56a298288cf64eei0",
@@ -381,14 +388,13 @@
                 invoicing: "INVOICING...",
                 multiverseHeading: "Bitcoin Ordinals Gashapon",
                 multiverseSub: "Multiverse Edition",
-                multiverseDesc: "Spend 300 sats to randomly draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!",
+                multiverseDesc: "Draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!",
                 selectMode: "SELECT GASHAPON MODE",
-                playBtn: "SPIN GASHAPON FOR 300 SATS",
-                demoBtn: "FREE PLAY DEMO (Test Mode)",
                 customSlugPlaceholder: "e.g., taproot-wizards",
                 customSlugHelper: "*Please enter the unique 'Slug' found at the end of the collection's marketplace URL (e.g., Magic Eden or Ordinals Wallet).",
                 paymentHeader: "PAY LIGHTNING INVOICE",
-                paymentSub: "Please send 300 sats to spin the Gashapon",
+                paymentSubPrefix: "Please send ",
+                paymentSubSuffix: " sats to spin the Gashapon",
                 paymentOpenWallet: "Open Wallet",
                 paymentCopy: "Copy Invoice Address",
                 paymentCopySuccess: "Copied!",
@@ -403,11 +409,17 @@
                 optFrogs: "🐸 Bitcoin Frogs",
                 optMonkes: "🐒 NodeMonkes",
                 optPuppets: "🧸 Bitcoin Puppets",
-                optPunks: "👤 Bitcoin Punks",
                 optBMonkes: "🦍 Bitcoin Monkes",
                 optPepes: "🐸 VeryLongPepes",
                 optAnons: "🎭 Anons",
-                optCustom: "✍️ Custom Slug..."
+                optCustom: "✍️ Custom Slug...",
+                freeSpinLeft: "FREE SPIN (",
+                freeSpinRight: " LEFT)",
+                spinFor: "SPIN GASHAPON FOR ",
+                sats: " SATS",
+                free: "FREE",
+                setAmount: "SET AMOUNT (SATS)",
+                sliderHelper: "*You can freely set the amount to pay (300 - 10000 sats)."
             },
             jp: {
                 pageTitle: "Bitcoin Ordinals ガシャポン",
@@ -421,14 +433,13 @@
                 invoicing: "請求書作成中...",
                 multiverseHeading: "Bitcoin Ordinals ガシャポン",
                 multiverseSub: "マルチバース・エディション",
-                multiverseDesc: "1回 300 sats で、ビットコインのブロックチェーンに刻まれた伝説的コレクションをその場で引き当てます！実在する本物のオンチェーンデータを引き出し、公式インデクサーで検証できます。見たいコレクションのコレクション名（Slug）を入力してガチャガチャとして遊ぶことも可能です！",
+                multiverseDesc: "ビットコインのブロックチェーンに刻まれた伝説的コレクションをその場で引き当てます！実在する本物のオンチェーンデータを引き出し、公式インデクサーで検証できます。見たいコレクションのコレクション名（Slug）を入力してガチャガチャとして遊ぶことも可能です！",
                 selectMode: "ガシャポンモード選択",
-                playBtn: "300 SATS でガチャを回す",
-                demoBtn: "フリーデモで遊ぶ (テスト用)",
                 customSlugPlaceholder: "例: taproot-wizards",
                 customSlugHelper: "※ Magic EdenやOrdinals WalletなどのURLの最後にある、コレクション固有の「Slug（識別名）」を入力してください。",
                 paymentHeader: "ライトニング・インボイス支払い",
-                paymentSub: "ガシャポンを動かすために300satsを送金してください",
+                paymentSubPrefix: "ガシャポンを動かすために ",
+                paymentSubSuffix: " satsを送金してください",
                 paymentOpenWallet: "ウォレットを起動する",
                 paymentCopy: "インボイス文字列をコピー",
                 paymentCopySuccess: "コピー完了！",
@@ -443,13 +454,51 @@
                 optFrogs: "🐸 Bitcoin Frogs",
                 optMonkes: "🐒 NodeMonkes",
                 optPuppets: "🧸 Bitcoin Puppets",
-                optPunks: "👤 Bitcoin Punks",
                 optBMonkes: "🦍 Bitcoin Monkes",
                 optPepes: "🐸 VeryLongPepes",
                 optAnons: "🎭 Anons",
-                optCustom: "✍️ カスタムSlugを直接入力する..."
+                optCustom: "✍️ カスタムSlugを直接入力する...",
+                freeSpinLeft: "無料で回す (残り",
+                freeSpinRight: "回)",
+                spinFor: "",
+                sats: " SATS でガチャを回す",
+                free: "無料",
+                setAmount: "金額を設定 (SATS)",
+                sliderHelper: "※ 支払う金額を任意に設定できます（300 〜 10000 sats）。"
             }
         };
+
+        // 🌟UI・価格・ボタンテキストの動的更新
+        function updatePriceUI() {
+            const t = TRANSLATIONS[currentLang];
+            const btnPlayText = document.getElementById('btn-play-text');
+            const priceBadge = document.getElementById('price-badge');
+            const sliderContainer = document.getElementById('slider-container');
+            const sliderValueDisplay = document.getElementById('slider-value-display');
+            const sliderValue = document.getElementById('price-slider').value;
+
+            document.getElementById('label-amount').innerHTML = `<i class="fa-solid fa-coins mr-1 text-orange-500"></i>${t.setAmount}`;
+            document.getElementById('slider-helper').textContent = t.sliderHelper;
+            sliderValueDisplay.textContent = `${sliderValue} SATS`;
+
+            if (freeSpinsLeft > 0) {
+                btnPlayText.textContent = `${t.freeSpinLeft}${freeSpinsLeft}${t.freeSpinRight}`;
+                priceBadge.textContent = t.free;
+                priceBadge.className = "text-emerald-600 font-game font-black text-sm bg-emerald-100/60 px-2 py-0.5 rounded-md border border-emerald-200 transition-all";
+                sliderContainer.classList.add('hidden');
+            } else {
+                btnPlayText.textContent = currentLang === 'en' ? `${t.spinFor}${sliderValue}${t.sats}` : `${sliderValue}${t.sats}`;
+                priceBadge.textContent = `${sliderValue} SATS`;
+                priceBadge.className = "text-orange-600 font-game font-black text-sm bg-orange-100/60 px-2 py-0.5 rounded-md border border-orange-200 transition-all";
+                sliderContainer.classList.remove('hidden');
+            }
+        }
+
+        // スライダー操作イベント
+        document.getElementById('price-slider').addEventListener('input', () => {
+            updatePriceUI();
+            playAudio('click');
+        });
 
         function updateLanguage(lang) {
             currentLang = lang;
@@ -465,13 +514,10 @@
             document.getElementById('price-label').innerHTML = `<i class="fa-solid fa-coins mr-1 text-amber-500"></i>${t.price}`;
             document.getElementById('twist-handle-label').textContent = t.twistHandle.toUpperCase();
             
-            document.getElementById('btn-play-text').textContent = t.playBtn;
-            document.getElementById('btn-demo').textContent = t.demoBtn;
             document.getElementById('input-custom-slug').placeholder = t.customSlugPlaceholder;
             document.getElementById('custom-slug-helper').textContent = t.customSlugHelper;
             
             document.getElementById('payment-header').textContent = t.paymentHeader;
-            document.getElementById('payment-sub').textContent = t.paymentSub;
             document.getElementById('lnk-wallet-text').textContent = t.paymentOpenWallet;
             document.getElementById('copy-text').textContent = t.paymentCopy;
             document.getElementById('payment-waiting-text').textContent = t.paymentWaiting;
@@ -485,11 +531,12 @@
             const select = document.getElementById('select-mode');
             select.options[0].text = t.optMultiverse; select.options[1].text = t.optMimi;
             select.options[2].text = t.optFrogs; select.options[3].text = t.optMonkes;
-            select.options[4].text = t.optPuppets; select.options[5].text = t.optPunks;
-            select.options[6].text = t.optBMonkes; select.options[7].text = t.optPepes;
-            select.options[8].text = t.optAnons; select.options[9].text = t.optCustom;
+            select.options[4].text = t.optPuppets; select.options[5].text = t.optBMonkes;
+            select.options[6].text = t.optPepes; select.options[7].text = t.optAnons;
+            select.options[8].text = t.optCustom;
 
             updateDisplayStateText();
+            updatePriceUI(); // 言語切替時にボタンの価格テキスト等も更新
         }
 
         function updateDisplayStateText() {
@@ -546,10 +593,11 @@
         document.getElementById('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; document.getElementById('sound-icon').className = soundEnabled ? "fa-solid fa-volume-high text-orange-500" : "fa-solid fa-volume-xmark text-slate-400"; });
         document.getElementById('select-mode').addEventListener('change', () => { document.getElementById('custom-slug-container').classList.toggle('hidden', document.getElementById('select-mode').value !== 'custom'); playAudio('click'); });
 
-        async function createInvoice() {
+        // 引数で支払額を受け取るように変更
+        async function createInvoice(amount) {
             const response = await fetch(`${LNBITS_URL}/api/v1/payments`, {
                 method: 'POST', headers: { 'X-Api-Key': INVOICE_READ_KEY, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ out: false, amount: SPIN_AMOUNT, memo: "Ordinals Gashapon Spin", unit: "sat" })
+                body: JSON.stringify({ out: false, amount: amount, memo: "Ordinals Gashapon Spin", unit: "sat" })
             });
             if (!response.ok) throw new Error("API Failed");
             const data = await response.json(); return { hash: data.payment_hash, invoice: data.payment_request };
@@ -698,11 +746,28 @@
                 alert(currentLang === 'en' ? "Please enter an Ordinals collection slug." : "カスタムコレクションのSlugを入力してください。"); return;
             }
 
-            playAudio('click'); currentState = STATE.INVOICING; updateDisplayStateText();
+            playAudio('click'); 
+            
+            // 🌟 無料ガチャロジック
+            if (freeSpinsLeft > 0) {
+                freeSpinsLeft--;
+                updatePriceUI();
+                const mockHash = "free_hash_" + Math.random().toString(36).substring(2, 15);
+                playGashaponRotation(mockHash);
+                return;
+            }
+
+            // 🌟 有料ガチャロジック
+            currentState = STATE.INVOICING; updateDisplayStateText();
             toggleModal(document.getElementById('payment-modal'), true);
 
+            // スライダーから支払額を取得
+            const amountToPay = parseInt(document.getElementById('price-slider').value, 10);
+            const t = TRANSLATIONS[currentLang];
+            document.getElementById('payment-sub').textContent = `${t.paymentSubPrefix}${amountToPay}${t.paymentSubSuffix}`;
+
             try {
-                const invoiceData = await createInvoice(); activePaymentHash = invoiceData.hash;
+                const invoiceData = await createInvoice(amountToPay); activePaymentHash = invoiceData.hash;
                 const qrContainer = document.getElementById('qrcode'); qrContainer.innerHTML = "";
                 new QRCode(qrContainer, { text: invoiceData.invoice, width: 192, height: 192, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
                 document.getElementById('lnk-wallet').href = `lightning:${invoiceData.invoice}`;
@@ -722,11 +787,6 @@
                 toggleModal(document.getElementById('payment-modal'), false); currentState = STATE.IDLE; updateDisplayStateText();
             }
         }
-
-        document.getElementById('btn-demo').addEventListener('click', () => {
-            if (currentState === STATE.ROLLING || currentState === STATE.HAS_CAPSULE) { alert(currentLang === 'en' ? "Please open the capsule before testing again." : "カプセルを開封してから次のテストを行ってください。"); return; }
-            playAudio('click'); playGashaponRotation("demo_hash_" + Math.random().toString(36).substring(2, 15));
-        });
 
         document.getElementById('btn-play').addEventListener('click', handleStartPay);
         document.getElementById('crank-handle').addEventListener('click', () => {
@@ -750,6 +810,7 @@
             currentState = STATE.IDLE; updateDisplayStateText();
         });
 
+        // 起動時
         updateLanguage('en');
     </script>
 </body>
