@@ -129,8 +129,6 @@
             <div id="gashapon-machine" class="relative w-72 sm:w-80 bg-white rounded-[2.5rem] p-6 border-4 border-amber-200 shadow-2xl flex flex-col items-center transition-all duration-300">
                 
                 <!-- 可愛い3Dガシャポン画像配置エリア（ガラスドームに代わる部分） -->
-                <!-- ※ リポジトリに gashapon-machine.png をアップロードして同一階層に置いてください。 -->
-                <!-- 存在しない場合は、仮のプレースホルダー画像にフォールバックされます。 -->
                 <div class="relative w-full h-56 bg-amber-50/50 rounded-2xl border-2 border-amber-100 overflow-hidden flex items-center justify-center shadow-inner group">
                     <img id="gashapon-interior-img" src="./gashapon-machine.png" alt="Gashapon Machine" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&q=80&w=600';">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
@@ -147,7 +145,7 @@
                     <!-- コイン・支払い価格表示 -->
                     <div class="flex justify-between items-center w-full px-2 mb-3 text-xs tracking-wider font-bold">
                         <span id="price-label" class="text-slate-500 font-game"><i class="fa-solid fa-coins mr-1 text-amber-500"></i>PRICE</span>
-                        <span class="text-orange-600 font-game font-black text-sm bg-orange-100/60 px-2 py-0.5 rounded-md border border-orange-200">10 SATS</span>
+                        <span class="text-orange-600 font-game font-black text-sm bg-orange-100/60 px-2 py-0.5 rounded-md border border-orange-200">300 SATS</span>
                     </div>
 
                     <!-- 回転ハンドル -->
@@ -189,7 +187,7 @@
                         Bitcoin Ordinals Gashapon<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-600">Multiverse Edition</span>
                     </h2>
                     <p id="main-desc" class="text-sm text-slate-600 leading-relaxed font-medium">
-                        Spend 10 sats to randomly draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!
+                        Spend 300 sats to randomly draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!
                     </p>
                 </div>
 
@@ -202,8 +200,10 @@
                         <option value="bitcoin-frogs">🐸 Bitcoin Frogs</option>
                         <option value="nodemonkes">🐒 NodeMonkes</option>
                         <option value="bitcoin-puppets">🧸 Bitcoin Puppets</option>
-                        <option value="quantum-cats">🐈 Quantum Cats</option>
-                        <option value="runestone">🪨 Runestone</option>
+                        <option value="bitcoin-punks">👤 Bitcoin Punks</option>
+                        <option value="bitcoin-monkes">🦍 Bitcoin Monkes</option>
+                        <option value="verylongpepes">🐸 VeryLongPepes</option>
+                        <option value="anons">🎭 Anons</option>
                         <option value="custom">✍️ Custom Slug...</option>
                     </select>
                     
@@ -218,7 +218,7 @@
                 <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/60 flex flex-col space-y-3">
                     <button id="btn-play" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-game font-bold py-4 px-6 rounded-xl shadow-lg shadow-orange-500/10 active:scale-[0.99] transition duration-150 text-base tracking-wider flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-play"></i>
-                        <span id="btn-play-text">SPIN GASHAPON FOR 10 SATS</span>
+                        <span id="btn-play-text">SPIN GASHAPON FOR 300 SATS</span>
                     </button>
                     <!-- フリーデモ機能 -->
                     <button id="btn-demo" class="text-xs text-slate-400 hover:text-slate-600 transition text-center underline font-game font-bold">
@@ -239,7 +239,7 @@
 
             <div class="text-center space-y-1">
                 <h3 id="payment-header" class="text-lg font-black font-game tracking-wider text-slate-800">PAY LIGHTNING INVOICE</h3>
-                <p id="payment-sub" class="text-xs text-slate-500 font-medium">Please send 10 sats to spin the Gashapon</p>
+                <p id="payment-sub" class="text-xs text-slate-500 font-medium">Please send 300 sats to spin the Gashapon</p>
             </div>
 
             <!-- QRコード表示エリア -->
@@ -280,16 +280,16 @@
                 <h3 id="prize-name" class="text-xl font-black font-game tracking-wider text-slate-800">MIMI #000</h3>
             </div>
 
-            <!-- 商品のリアル画像表示エリア -->
+            <!-- 商品の画像表示エリア（シャッフルアニメーション用） -->
             <div class="relative group">
                 <div class="absolute -inset-1.5 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                 <div class="relative w-72 h-72 sm:w-80 sm:h-80 bg-slate-900 rounded-2xl shadow-2xl border-4 border-white overflow-hidden flex items-center justify-center">
                     <!-- 画像読込スピナー -->
-                    <div id="prize-img-loader" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-10">
+                    <div id="prize-img-loader" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-10 hidden">
                         <i class="fa-solid fa-circle-notch animate-spin text-3xl text-orange-400"></i>
                     </div>
                     <!-- 本物のオンチェーン画像 -->
-                    <img id="prize-img" class="w-full h-full object-contain relative z-0 opacity-0 transition-opacity duration-300" src="" alt="Ordinals Art">
+                    <img id="prize-img" class="w-full h-full object-contain relative z-0 transition-opacity duration-300" src="" alt="Ordinals Art">
                 </div>
             </div>
 
@@ -358,7 +358,7 @@
         // ------------------------------------
         const LNBITS_URL = "https://demo.lnbits.com";
         const INVOICE_READ_KEY = "67e5b0ad270f44d19e6d768bb3314e49";
-        const SPIN_AMOUNT = 10; // sats
+        const SPIN_AMOUNT = 300; // satsに変更
 
         const STATE = {
             IDLE: "idle",
@@ -380,10 +380,34 @@
             "bitcoin-frogs",
             "nodemonkes",
             "bitcoin-puppets",
-            "quantum-cats",
-            "runestone",
-            "taproot-wizards",
-            "omb"
+            "bitcoin-punks",
+            "bitcoin-monkes",
+            "verylongpepes",
+            "anons"
+        ];
+
+        // 高速シャッフル（スロット演出）に利用する代表的な20銘録のIDリスト
+        const SHUFFLE_IDS = [
+            "0dfa3a9366e6c466472f8888bf409976fc2713fa432c4dccf2f64485522c3ci0",
+            "0256dbe126742512684ab33a201c13bfda63fc50486a4e32d56a298288cf64eei0",
+            "c369c0d10e54bf83dfab7ec38be0d8be0d8be09febe6fc25027552554702fb7ci0",
+            "83e06cf5a6a416aef478a536ba74320012f4886859c1511a0ace08d33630f5dfi0",
+            "4a1d8dbcb7db16f05b1c55392275412df0dbf4e937e0ff456e4df455a22c3ci0",
+            "7d3eb89fb13a0ff4bf05b6b19a2e1c01e38ffc5a2c2621c5b8b939c362d8884i0",
+            "9b5e5c5438b939c148f4b17bcbf86a346df0dfd5d5d1feee37ea7392fb8d184i0",
+            "2dbf378a9c2a863be2441c19bca0ceb8ff34fcfc4fec3eef3e1645e7f1e6b349i0",
+            "12f4887773c7f8a66416febb3ab94980cbf28ffd914fa140fdd4fc629821966ci0",
+            "bf6e2a92dd3e599b598b5f2e83e06cf58d61ff418d61ff414a1d8dbcb7db16f0i0",
+            "b6f9c060d914fa1412f488adi02439bff7i0989c56d7iba743200i0a0ace0d3i0",
+            "fca883a1aef478a5b6f9c060d914fa1412f488adi02439bff7i0989c56d7iba74i0",
+            "d6afa41bbf6e2a9290208397598b5f2e83e06cf5dd3e599b598b5f2ei0bf6e2ai0",
+            "f5ed16b016e66f51bf6e2a92dd3e599bbf6e2a92dd3e599bbf6e2a92dd3e599bi0",
+            "5bba1936bf6e2a92bf6e2a92bf6e2a92bf6e2a92bf6e2a92bf6e2a92bf6e2a92i0",
+            "356777i0",
+            "6fb97b0a90c2da8e8d2e81f1816155556277685675548564856485648564856i0",
+            "6859c151i07773c7f8i0a66416fei0bb3ab949i080cbf28fi0aef478a5i0fca8i0",
+            "8d61ff41c91e4d725fdaf8442439bff7989c56d7ba7432000fdd4fc612f488adi0",
+            "2439bff7989c56d7ba743200a0ace0d35fdaf844c91e4d728d61ff412a884fbfi0"
         ];
 
         // ------------------------------------
@@ -402,14 +426,14 @@
                 invoicing: "INVOICING...",
                 multiverseHeading: "Bitcoin Ordinals Gashapon",
                 multiverseSub: "Multiverse Edition",
-                multiverseDesc: "Spend 10 sats to randomly draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!",
+                multiverseDesc: "Spend 300 sats to randomly draw legendary Ordinals collections inscribed on the Bitcoin blockchain! Fetch real on-chain data and verify them with official explorers. Simply select or enter any Ordinals collection slug to play!",
                 selectMode: "SELECT GASHAPON MODE",
-                playBtn: "SPIN GASHAPON FOR 10 SATS",
+                playBtn: "SPIN GASHAPON FOR 300 SATS",
                 demoBtn: "FREE PLAY DEMO (Test Mode)",
                 customSlugPlaceholder: "e.g., taproot-wizards",
                 customSlugHelper: "*Please enter the unique 'Slug' found at the end of the collection's marketplace URL (e.g., Magic Eden or Ordinals Wallet).",
                 paymentHeader: "PAY LIGHTNING INVOICE",
-                paymentSub: "Please send 10 sats to spin the Gashapon",
+                paymentSub: "Please send 300 sats to spin the Gashapon",
                 paymentOpenWallet: "Open Wallet",
                 paymentCopy: "Copy Invoice Address",
                 paymentCopySuccess: "Copied!",
@@ -423,8 +447,10 @@
                 optFrogs: "🐸 Bitcoin Frogs",
                 optMonkes: "🐒 NodeMonkes",
                 optPuppets: "🧸 Bitcoin Puppets",
-                optCats: "🐈 Quantum Cats",
-                optStone: "🪨 Runestone",
+                optPunks: "👤 Bitcoin Punks",
+                optBMonkes: "🦍 Bitcoin Monkes",
+                optPepes: "🐸 VeryLongPepes",
+                optAnons: "🎭 Anons",
                 optCustom: "✍️ Custom Slug..."
             },
             jp: {
@@ -439,14 +465,14 @@
                 invoicing: "請求書作成中...",
                 multiverseHeading: "Bitcoin Ordinals ガシャポン",
                 multiverseSub: "マルチバース・エディション",
-                multiverseDesc: "1回 10 sats で、ビットコインのブロックチェーンに刻まれた伝説的コレクションをその場で引き当てます！実在する本物のオンチェーンデータを引き出し、公式インデクサーで検証できます。見たいコレクションのコレクション名（Slug）を入力してガチャガチャとして遊ぶことも可能です！",
+                multiverseDesc: "1回 300 sats で、ビットコインのブロックチェーンに刻まれた伝説的コレクションをその場で引き当てます！実在する本物のオンチェーンデータを引き出し、公式インデクサーで検証できます。見たいコレクションのコレクション名（Slug）を入力してガチャガチャとして遊ぶことも可能です！",
                 selectMode: "ガシャポンモード選択",
-                playBtn: "10 SATS でガチャを回す",
+                playBtn: "300 SATS でガチャを回す",
                 demoBtn: "フリーデモで遊ぶ (テスト用)",
                 customSlugPlaceholder: "例: taproot-wizards",
                 customSlugHelper: "※ Magic EdenやOrdinals WalletなどのURLの最後にある、コレクション固有の「Slug（識別名）」を入力してください。",
                 paymentHeader: "ライトニング・インボイス支払い",
-                paymentSub: "ガシャポンを動かすために10satsを送金してください",
+                paymentSub: "ガシャポンを動かすために300satsを送金してください",
                 paymentOpenWallet: "ウォレットを起動する",
                 paymentCopy: "インボイス文字列をコピー",
                 paymentCopySuccess: "コピー完了！",
@@ -460,8 +486,10 @@
                 optFrogs: "🐸 Bitcoin Frogs",
                 optMonkes: "🐒 NodeMonkes",
                 optPuppets: "🧸 Bitcoin Puppets",
-                optCats: "🐈 Quantum Cats",
-                optStone: "🪨 Runestone",
+                optPunks: "👤 Bitcoin Punks",
+                optBMonkes: "🦍 Bitcoin Monkes",
+                optPepes: "🐸 VeryLongPepes",
+                optAnons: "🎭 Anons",
                 optCustom: "✍️ カスタムSlugを直接入力する..."
             }
         };
@@ -505,9 +533,11 @@
             select.options[2].text = t.optFrogs;
             select.options[3].text = t.optMonkes;
             select.options[4].text = t.optPuppets;
-            select.options[5].text = t.optCats;
-            select.options[6].text = t.optStone;
-            select.options[7].text = t.optCustom;
+            select.options[5].text = t.optPunks;
+            select.options[6].text = t.optBMonkes;
+            select.options[7].text = t.optPepes;
+            select.options[8].text = t.optAnons;
+            select.options[9].text = t.optCustom;
 
             updateDisplayStateText();
         }
@@ -764,23 +794,11 @@
             }, 1500);
         }
 
-        // カプセル開封＆リアルオンチェーン銘録ロード処理
+        // 開封・高速シャッフルロード処理
+        let shuffleInterval = null;
+
         async function triggerReveal(seed) {
             playAudio('pop');
-            confetti({
-                particleCount: 120,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-
-            // カプセルリセット
-            dispensedCapsule.classList.add('hidden');
-            dispensedCapsule.classList.remove('animate-drop', 'capsule-glow');
-            crankHandle.style.transform = "rotate(0deg)";
-            crankHandle.style.transition = "none";
-            
-            currentState = STATE.IDLE;
-            updateDisplayStateText();
 
             // 1. ガチャモードに基づき対象のSlug（コレクション識別名）を決定
             let targetSlug = selectMode.value;
@@ -799,7 +817,39 @@
                 if (!targetSlug) targetSlug = "ordinal-mimi";
             }
 
-            // 2. 決定したSlugの全データリストをAPIからリアルタイムクエリ
+            // 2. 開封モーダルをすぐ開いて、スロットマシンのように超高速シャッフルを開始
+            const pImg = document.getElementById('prize-img');
+            const loader = document.getElementById('prize-img-loader');
+            
+            document.getElementById('prize-name').textContent = currentLang === 'en' ? "MINTING / SHUFFLING..." : "ミント / シャッフル中...";
+            document.getElementById('prize-rarity').textContent = "#??????";
+            document.getElementById('prize-palette').textContent = targetSlug.toUpperCase();
+
+            pImg.classList.remove('opacity-0');
+            pImg.classList.add('opacity-100');
+            loader.classList.add('hidden'); // スピナーではなく高速演出を表示
+
+            toggleModal(prizeModal, true);
+            currentState = STATE.REVEALED;
+
+            let shuffleCount = 0;
+            if (shuffleInterval) clearInterval(shuffleInterval);
+            
+            // 90ミリ秒ごとに20種類の銘録画像をランダムに切り替え
+            shuffleInterval = setInterval(() => {
+                const randomId = SHUFFLE_IDS[Math.floor(Math.random() * SHUFFLE_IDS.length)];
+                pImg.src = `https://cdn.ordinalswallet.com/inscription/preview/${randomId}`;
+                shuffleCount++;
+            }, 90);
+
+            // カプセル物理演出をリセット
+            dispensedCapsule.classList.add('hidden');
+            dispensedCapsule.classList.remove('animate-drop', 'capsule-glow');
+            crankHandle.style.transform = "rotate(0deg)";
+            crankHandle.style.transition = "none";
+            setMachineDisplay("READY");
+
+            // 3. バックグラウンドで本番APIへのフェッチを開始
             let inscriptionsList = [];
             try {
                 const response = await fetch(`https://turbo.ordinalswallet.com/collection/${targetSlug}/inscriptions`);
@@ -815,52 +865,76 @@
                     inscriptionsList = Array.isArray(fallbackData) ? fallbackData : (fallbackData.inscriptions || []);
                 } catch (fallbackErr) {
                     console.error("Critical: Fallback failed");
+                    clearInterval(shuffleInterval);
+                    toggleModal(prizeModal, false);
+                    currentState = STATE.IDLE;
+                    updateDisplayStateText();
+                    alert("API error. Please try again.");
+                    return;
                 }
             }
 
             if (inscriptionsList.length === 0) {
+                clearInterval(shuffleInterval);
                 alert(currentLang === 'en' ? "Failed to fetch collection data." : "コレクションデータが見つかりませんでした。");
+                toggleModal(prizeModal, false);
                 currentState = STATE.IDLE;
                 updateDisplayStateText();
                 return;
             }
 
-            // 3. データプールからハッシュに基づき一意の1点を選出
+            // データプールからハッシュに基づき一意の1点を選出
             const finalIdx = Math.abs(hash) % inscriptionsList.length;
             const wonItem = inscriptionsList[finalIdx];
             const wonItemId = wonItem.id || wonItem.inscription_id || wonItem.inscriptionId;
             const wonItemNum = wonItem.num || wonItem.number || wonItem.inscription_number || wonItem.inscriptionNumber || "On-Chain";
             const wonItemName = (wonItem.meta && wonItem.meta.name) ? wonItem.meta.name : (`#${wonItemNum}`);
 
-            // 4. モーダルにデータを埋め込み
-            document.getElementById('prize-name').textContent = wonItemName;
-            document.getElementById('prize-rarity').textContent = `#${wonItemNum}`;
-            document.getElementById('prize-palette').textContent = targetSlug.toUpperCase();
+            // 4. 当選した本物画像を事前にブラウザにプリロード
+            const finalRealImgUrl = `https://cdn.ordinalswallet.com/inscription/preview/${wonItemId}`;
+            const preloaderImg = new Image();
+            preloaderImg.src = finalRealImgUrl;
 
-            // 5. 画像要素のフェードロード
-            const pImg = document.getElementById('prize-img');
-            const loader = document.getElementById('prize-img-loader');
-            pImg.classList.add('opacity-0');
-            loader.classList.remove('hidden');
+            // スロット停止＆当選確定処理
+            const finalizeReveal = () => {
+                clearInterval(shuffleInterval);
+                confetti({
+                    particleCount: 120,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                playAudio('success');
 
-            const realImgUrl = `https://cdn.ordinalswallet.com/inscription/preview/${wonItemId}`;
-            pImg.src = realImgUrl;
-            pImg.onload = () => {
-                loader.classList.add('hidden');
-                pImg.classList.remove('opacity-0');
-                pImg.classList.add('opacity-100');
+                pImg.src = finalRealImgUrl;
+                document.getElementById('prize-name').textContent = wonItemName;
+                document.getElementById('prize-rarity').textContent = `#${wonItemNum}`;
+                document.getElementById('prize-palette').textContent = targetSlug.toUpperCase();
+
+                // ordinals.com 鑑定ボタン
+                const explorerBtn = document.getElementById('btn-explorer-link');
+                explorerBtn.href = `https://ordinals.com/inscription/${wonItemId}`;
+
+                // Gammaボタン
+                const gammaLink = document.getElementById('btn-gamma-link');
+                gammaLink.href = `https://gamma.io/inscription/${wonItemId}`;
             };
 
-            // ordinals.com リンク
-            const explorerBtn = document.getElementById('btn-explorer-link');
-            explorerBtn.href = `https://ordinals.com/inscription/${wonItemId}`;
+            // 最低でも1.5秒間はスロット演出を楽しめるように時間を制御
+            const elapsedShuffleTime = shuffleCount * 90;
+            const minShuffleTime = 1500; // 最低シャッフル時間 1.5s
+            const remainingTime = Math.max(0, minShuffleTime - elapsedShuffleTime);
 
-            // Gammaリンク
-            const gammaLink = document.getElementById('btn-gamma-link');
-            gammaLink.href = `https://gamma.io/inscription/${wonItemId}`;
+            preloaderImg.onload = () => {
+                setTimeout(() => {
+                    finalizeReveal();
+                }, remainingTime);
+            };
 
-            // 景品モーダル表示
-            toggleModal(prizeModal, true);
+            preloaderImg.onerror = () => {
+                setTimeout(() => {
+                    finalizeReveal();
+                }, remainingTime);
+            };
         }
 
         // インボイスアドレスのコピー機能
@@ -977,6 +1051,7 @@
             updateDisplayStateText();
         });
         btnClosePrize.addEventListener('click', () => {
+            if (shuffleInterval) clearInterval(shuffleInterval);
             toggleModal(prizeModal, false);
             dispensedCapsule.classList.add('hidden');
             dispensedCapsule.classList.remove('animate-drop', 'capsule-glow');
@@ -984,7 +1059,7 @@
             updateDisplayStateText();
         });
 
-        // 初期言語設定を実行
+        // 初期言語設定（デフォルトは英語）
         updateLanguage('en');
 
     </script>
