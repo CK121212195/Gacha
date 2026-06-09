@@ -1,13 +1,13 @@
 # 🎰 Bitcoin Ordinals Gashapon - Multiverse Edition 🪐
 
-[🇯🇵 日本語のREADMEはこちら (Click here for the Japanese version)](./README_ja.md)
+[🇯🇵 日本語のREADMEはこちら (Click here for the Japanese version)](https://github.com/CK121212195/Gacha/blob/main/README_ja.md)
 
 Welcome to the **Bitcoin Ordinals Gashapon**! 
 Draw legendary art and digital artifacts inscribed on the Bitcoin blockchain in a traditional, exciting Japanese "Gashapon" style! ⚡️
 
-![Gashapon Demo](./demo.gif)
+<img src="https://raw.githubusercontent.com/CK121212195/Gacha/main/demo.gif" width="650" alt="Gashapon Demo">
 
-🌐 **Play Now:** [Insert your Live Demo URL here]
+🌐 **Play Now:** [https://ck121212195.github.io/Gacha/](https://ck121212195.github.io/Gacha/)
 
 ---
 
@@ -26,7 +26,7 @@ Even if a server goes down or a company disappears, as long as Bitcoin exists, t
 * **🧩 Custom Collections:** Enter any valid collection slug (e.g., from Magic Eden or Gamma) to fill the Gashapon with the collection you love.
 * **🔍 Instant On-Chain Verification:** Verify the authenticity of your drawn artifact instantly via `ordinals.com` or `Gamma.io`.
 
-![Result Screen Example](./result.png)
+<img src="https://raw.githubusercontent.com/CK121212195/Gacha/main/result.png" width="400" alt="Result Screen Example">
 
 ---
 
