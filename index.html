@@ -194,6 +194,9 @@
                         <option value="very-long-pepes">🐸 VeryLongPepes</option>
                         <option value="anons">🎭 Anons</option>
                         <option value="bitcoinpunks">💀 Bitcoin Punks</option>
+                        <option value="ordinal-pizza-og">🍕 Ordinal Pizza Og</option>
+                        <option value="dogepunks">🐶 DogePunks</option>
+                        <option value="space-pepes">🚀 Space Pepes</option>
                         <option value="custom">✍️ Custom Slug...</option>
                     </select>
                     
@@ -383,7 +386,8 @@
 
         const CURATED_SLUGS = [
             "ordinal-mimi", "bitcoin-frogs", "nodemonkes", "bitcoin-puppets",
-            "bitcoin-monkes", "very-long-pepes", "anons", "bitcoinpunks"
+            "bitcoin-monkes", "very-long-pepes", "anons", "bitcoinpunks",
+            "ordinal-pizza-og", "dogepunks", "space-pepes"
         ];
 
         // 🌟 画像が正常に読み込める「本物のサブ100k画像データ」に10件とも統一しました 🌟
@@ -438,6 +442,9 @@
                 optPepes: "🐸 VeryLongPepes",
                 optAnons: "🎭 Anons",
                 optPunks: "💀 Bitcoin Punks",
+                optPizzaOg: "🍕 Ordinal Pizza Og",
+                optDogePunks: "🐶 DogePunks",
+                optSpacePepes: "🚀 Space Pepes",
                 optCustom: "✍️ Custom Slug...",
                 freeSpinLeft: "FREE SPIN (",
                 freeSpinRight: " LEFT)",
@@ -486,6 +493,9 @@
                 optPepes: "🐸 VeryLongPepes",
                 optAnons: "🎭 Anons",
                 optPunks: "💀 Bitcoin Punks",
+                optPizzaOg: "🍕 Ordinal Pizza Og",
+                optDogePunks: "🐶 DogePunks",
+                optSpacePepes: "🚀 Space Pepes",
                 optCustom: "✍️ カスタムSlugを直接入力する...",
                 freeSpinLeft: "無料で回す (残り",
                 freeSpinRight: "回)",
@@ -558,11 +568,19 @@
             document.getElementById('btn-gamma-link-text').textContent = t.gammaBtn;
 
             const select = document.getElementById('select-mode');
-            select.options[0].text = t.optMultiverse; select.options[1].text = t.optMimi;
-            select.options[2].text = t.optFrogs; select.options[3].text = t.optMonkes;
-            select.options[4].text = t.optPuppets; select.options[5].text = t.optBMonkes;
-            select.options[6].text = t.optPepes; select.options[7].text = t.optAnons;
-            select.options[8].text = t.optPunks; select.options[9].text = t.optCustom;
+            select.options[0].text = t.optMultiverse; 
+            select.options[1].text = t.optMimi;
+            select.options[2].text = t.optFrogs; 
+            select.options[3].text = t.optMonkes;
+            select.options[4].text = t.optPuppets; 
+            select.options[5].text = t.optBMonkes;
+            select.options[6].text = t.optPepes; 
+            select.options[7].text = t.optAnons;
+            select.options[8].text = t.optPunks; 
+            select.options[9].text = t.optPizzaOg;
+            select.options[10].text = t.optDogePunks;
+            select.options[11].text = t.optSpacePepes;
+            select.options[12].text = t.optCustom;
 
             updateDisplayStateText();
             updatePriceUI(); 
