@@ -193,6 +193,7 @@
                         <option value="bitcoin-monkes">🦍 Bitcoin Monkes</option>
                         <option value="very-long-pepes">🐸 VeryLongPepes</option>
                         <option value="anons">🎭 Anons</option>
+                        <option value="bitcoin-punks">💀 Bitcoin Punks</option>
                         <option value="custom">✍️ Custom Slug...</option>
                     </select>
                     
@@ -365,7 +366,7 @@
 
         const CURATED_SLUGS = [
             "ordinal-mimi", "bitcoin-frogs", "nodemonkes", "bitcoin-puppets",
-            "bitcoin-monkes", "very-long-pepes", "anons"
+            "bitcoin-monkes", "very-long-pepes", "anons", "bitcoin-punks"
         ];
 
         const FALLBACK_IDS = [
@@ -418,6 +419,7 @@
                 optBMonkes: "🦍 Bitcoin Monkes",
                 optPepes: "🐸 VeryLongPepes",
                 optAnons: "🎭 Anons",
+                optPunks: "💀 Bitcoin Punks",
                 optCustom: "✍️ Custom Slug...",
                 freeSpinLeft: "FREE SPIN (",
                 freeSpinRight: " LEFT)",
@@ -463,6 +465,7 @@
                 optBMonkes: "🦍 Bitcoin Monkes",
                 optPepes: "🐸 VeryLongPepes",
                 optAnons: "🎭 Anons",
+                optPunks: "💀 Bitcoin Punks",
                 optCustom: "✍️ カスタムSlugを直接入力する...",
                 freeSpinLeft: "無料で回す (残り",
                 freeSpinRight: "回)",
@@ -537,7 +540,7 @@
             select.options[2].text = t.optFrogs; select.options[3].text = t.optMonkes;
             select.options[4].text = t.optPuppets; select.options[5].text = t.optBMonkes;
             select.options[6].text = t.optPepes; select.options[7].text = t.optAnons;
-            select.options[8].text = t.optCustom;
+            select.options[8].text = t.optPunks; select.options[9].text = t.optCustom;
 
             updateDisplayStateText();
             updatePriceUI(); 
