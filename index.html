@@ -193,7 +193,7 @@
                         <option value="bitcoin-monkes">🦍 Bitcoin Monkes</option>
                         <option value="very-long-pepes">🐸 VeryLongPepes</option>
                         <option value="anons">🎭 Anons</option>
-                        <option value="bitcoinpunks">💀 Bitcoin Punks</option> <!-- ★ハイフンなしの「bitcoinpunks」に修正 -->
+                        <option value="bitcoinpunks">💀 Bitcoin Punks</option>
                         <option value="custom">✍️ Custom Slug...</option>
                     </select>
                     
@@ -300,6 +300,13 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <span id="btn-explorer-link-text">Verify On-Chain (ordinals.com)</span>
                 </a>
+                
+                <!-- 🌟 Twitter / Xシェアボタン 🌟 -->
+                <a id="btn-share-twitter" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-2 shadow-md shadow-slate-900/10 opacity-50 pointer-events-none">
+                    <i class="fa-brands fa-x-twitter"></i>
+                    <span id="btn-share-twitter-text">Share on X (Twitter)</span>
+                </a>
+
                 <div class="flex gap-2">
                     <button id="btn-close-prize" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 px-4 rounded-xl text-xs font-bold transition duration-150 border border-slate-200 opacity-50 pointer-events-none">
                         Close
@@ -366,20 +373,19 @@
 
         const CURATED_SLUGS = [
             "ordinal-mimi", "bitcoin-frogs", "nodemonkes", "bitcoin-puppets",
-            "bitcoin-monkes", "very-long-pepes", "anons", "bitcoinpunks" // ★ハイフンなしの「bitcoinpunks」に修正
+            "bitcoin-monkes", "very-long-pepes", "anons", "bitcoinpunks"
         ];
 
-        // 🌟 文字欠け（62〜63文字）になっていた壊れたIDを、正しい64文字のInscription ID（本物のサブ100kデータなど）に差し替えました
         const FALLBACK_IDS = [
-            "6fb976ab49dcec017f1e201e84395983204ae1a7c2abf7ced0a85d692e442799i0", // Inscription 0 (64桁)
-            "26482871f33f1051f450f2da9af275794c0b5f1c61ebf35e4467fb42c2813403i0", // Inscription 1 (64桁)
-            "bb6f577e30e6840dce0474f3c3c55134404688e844982a49161502d3d69e322di0", // Inscription 668 (64桁)
-            "83e06cf5a6a416aef478a536ba74320012f4886859c1511a0ace08d33630f5dfi0", 
-            "0256dbe126742512684ab33a201c13bfda63fc50486a4e32d56a298288cf64eei0", 
-            "7d3eb89fb13a0ff4bf05b6b19a2e1c01e38ffc5a2c2621c5b8b939c362d8884fi0", 
-            "bf6e2a92dd3e599b598b5f2e83e06cf58d61ff418d61ff414a1d8dbcb7db16f0i0", 
-            "2dbf378a9c2a863be2441c19bca0ceb8ff34fcfc4fec3eef3e1645e7f1e6b349i0", 
-            "12f4887773c7f8a66416febb3ab94980cbf28ffd914fa140fdd4fc629821966ci0", 
+            "6fb976ab49dcec017f1e201e84395983204ae1a7c2abf7ced0a85d692e442799i0",
+            "26482871f33f1051f450f2da9af275794c0b5f1c61ebf35e4467fb42c2813403i0",
+            "bb6f577e30e6840dce0474f3c3c55134404688e844982a49161502d3d69e322di0",
+            "83e06cf5a6a416aef478a536ba74320012f4886859c1511a0ace08d33630f5dfi0",
+            "0256dbe126742512684ab33a201c13bfda63fc50486a4e32d56a298288cf64eei0",
+            "7d3eb89fb13a0ff4bf05b6b19a2e1c01e38ffc5a2c2621c5b8b939c362d8884fi0",
+            "bf6e2a92dd3e599b598b5f2e83e06cf58d61ff418d61ff414a1d8dbcb7db16f0i0",
+            "2dbf378a9c2a863be2441c19bca0ceb8ff34fcfc4fec3eef3e1645e7f1e6b349i0",
+            "12f4887773c7f8a66416febb3ab94980cbf28ffd914fa140fdd4fc629821966ci0",
             "c369c0d10e54bf83dfab7ec38be0d8be09febe6fc25027552554702fb7ci0"
         ];
 
@@ -410,6 +416,7 @@
                 capsuleOpened: "✨ Capsule Opened ✨",
                 loadingText: "MINTING ARTIFACT...",
                 verifyOnChain: "Verify On-Chain (ordinals.com)",
+                shareTwitter: "Share on X (Twitter)", // ★シェアボタン（英語）
                 closeBtn: "Close",
                 gammaBtn: "Official Gamma",
                 optMultiverse: "🌌 Chaos Multiverse (Random selection)",
@@ -456,6 +463,7 @@
                 capsuleOpened: "✨ カプセル開封 ✨",
                 loadingText: "アーティファクト取得中...",
                 verifyOnChain: "ordinals.com でオンチェーン鑑定",
+                shareTwitter: "X（Twitter）に投稿する", // ★シェアボタン（日本語）
                 closeBtn: "閉じる",
                 gammaBtn: "公式Gamma",
                 optMultiverse: "🌌 カオス・マルチバース (有名どころからランダム)",
@@ -533,6 +541,7 @@
             document.getElementById('capsule-opened-text').textContent = t.capsuleOpened;
             document.getElementById('loading-spinner-text').textContent = t.loadingText;
             document.getElementById('btn-explorer-link-text').textContent = t.verifyOnChain;
+            document.getElementById('btn-share-twitter-text').textContent = t.shareTwitter; // ★シェアボタン翻訳適用
             document.getElementById('btn-close-prize').textContent = t.closeBtn;
             document.getElementById('btn-gamma-link-text').textContent = t.gammaBtn;
 
@@ -705,6 +714,16 @@
                 document.getElementById('action-blocker').classList.add('hidden');
                 document.getElementById('btn-explorer-link').href = `https://ordinals.com/inscription/${wonItemId}`;
                 document.getElementById('btn-explorer-link').classList.remove('opacity-50', 'pointer-events-none');
+                
+                // 🌟 Twitter (X) シェア用URLを動的に生成 🌟
+                const siteUrl = "https://ck121212195.github.io/Gacha/";
+                const tweetText = `Just drew "${wonItemName}" from the "Bitcoin Ordinals Gashapon"! 🎰⚡️\n\nSpin the Gashapon here:`;
+                const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(siteUrl)}&hashtags=ordinals,gashapon`;
+                
+                const btnShare = document.getElementById('btn-share-twitter');
+                btnShare.href = twitterIntentUrl;
+                btnShare.classList.remove('opacity-50', 'pointer-events-none');
+
                 document.getElementById('btn-gamma-link').href = `https://gamma.io/inscription/${wonItemId}`;
                 document.getElementById('btn-gamma-link').classList.remove('opacity-50', 'pointer-events-none');
                 document.getElementById('btn-close-prize').classList.remove('opacity-50', 'pointer-events-none');
@@ -801,6 +820,7 @@
             
             document.getElementById('action-blocker').classList.remove('hidden');
             document.getElementById('btn-explorer-link').classList.add('opacity-50', 'pointer-events-none');
+            document.getElementById('btn-share-twitter').classList.add('opacity-50', 'pointer-events-none'); // ★シェアボタン状態初期化
             document.getElementById('btn-gamma-link').classList.add('opacity-50', 'pointer-events-none');
             document.getElementById('btn-close-prize').classList.add('opacity-50', 'pointer-events-none');
 
