@@ -301,11 +301,11 @@
                     <span id="btn-explorer-link-text">Verify On-Chain (ordinals.com)</span>
                 </a>
                 
-                <!-- 🌟 Twitter / Xシェアボタン 🌟 -->
-                <a id="btn-share-twitter" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-2 shadow-md shadow-slate-900/10 opacity-50 pointer-events-none">
+                <!-- 🌟 Twitter / Xシェアボタンをaタグからbutton要素に変更 🌟 -->
+                <button id="btn-share-twitter" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-2 shadow-md shadow-slate-900/10 opacity-50 pointer-events-none">
                     <i class="fa-brands fa-x-twitter"></i>
                     <span id="btn-share-twitter-text">Share on X (Twitter)</span>
-                </a>
+                </button>
 
                 <div class="flex gap-2">
                     <button id="btn-close-prize" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 px-4 rounded-xl text-xs font-bold transition duration-150 border border-slate-200 opacity-50 pointer-events-none">
@@ -366,6 +366,10 @@
         let soundEnabled = true;
         let currentLang = 'en';
 
+        // 🌟 最新当選情報を保持するグローバル変数 🌟
+        let lastWonItemImageUrl = "";
+        let lastWonItemName = "";
+
         // 🌟 localStorage を用いた永続的な無料枠管理（最大5回）
         const TOTAL_FREE_SPINS = 5;
         let freeSpinsUsed = parseInt(localStorage.getItem('ordGachaFreeSpinsUsed')) || 0;
@@ -416,7 +420,7 @@
                 capsuleOpened: "✨ Capsule Opened ✨",
                 loadingText: "MINTING ARTIFACT...",
                 verifyOnChain: "Verify On-Chain (ordinals.com)",
-                shareTwitter: "Share on X (Twitter)", // ★シェアボタン（英語）
+                shareTwitter: "Share on X (Twitter)", 
                 closeBtn: "Close",
                 gammaBtn: "Official Gamma",
                 optMultiverse: "🌌 Chaos Multiverse (Random selection)",
@@ -463,7 +467,7 @@
                 capsuleOpened: "✨ カプセル開封 ✨",
                 loadingText: "アーティファクト取得中...",
                 verifyOnChain: "ordinals.com でオンチェーン鑑定",
-                shareTwitter: "X（Twitter）に投稿する", // ★シェアボタン（日本語）
+                shareTwitter: "X（Twitter）に投稿する", 
                 closeBtn: "閉じる",
                 gammaBtn: "公式Gamma",
                 optMultiverse: "🌌 カオス・マルチバース (有名どころからランダム)",
@@ -541,7 +545,7 @@
             document.getElementById('capsule-opened-text').textContent = t.capsuleOpened;
             document.getElementById('loading-spinner-text').textContent = t.loadingText;
             document.getElementById('btn-explorer-link-text').textContent = t.verifyOnChain;
-            document.getElementById('btn-share-twitter-text').textContent = t.shareTwitter; // ★シェアボタン翻訳適用
+            document.getElementById('btn-share-twitter-text').textContent = t.shareTwitter; 
             document.getElementById('btn-close-prize').textContent = t.closeBtn;
             document.getElementById('btn-gamma-link-text').textContent = t.gammaBtn;
 
@@ -601,7 +605,7 @@
             toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i> ${message}`;
             document.body.appendChild(toast);
             setTimeout(() => toast.classList.remove('opacity-0'), 10);
-            setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 2500);
+            setTimeout(() => { toast.classList.add('opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
         }
 
         document.getElementById('btn-footer-donate').addEventListener('click', () => { navigator.clipboard.writeText("brashridge65@walletofsatoshi.com"); showToast(currentLang === 'en' ? "Address copied!" : "アドレスをコピーしました！"); playAudio('click'); });
@@ -641,6 +645,47 @@
                 cap.classList.remove('hidden'); cap.classList.add('animate-drop', 'capsule-glow');
                 cap.onclick = () => triggerReveal(seed);
             }, 1500);
+        }
+
+        // 🌟 画像データをクリップボード（PNG形式）にコピーする関数 🌟
+        async function copyImageToClipboard(imgUrl) {
+            try {
+                // CDNから画像データを取得してBlob化
+                const response = await fetch(imgUrl, { mode: 'cors' });
+                if (!response.ok) throw new Error("CORS or network error");
+                const blob = await response.blob();
+                
+                // Clipboard APIは image/png の書き込みのみ標準でサポートしています
+                const item = new ClipboardItem({ 'image/png': blob });
+                await navigator.clipboard.write([item]);
+                return true;
+            } catch (err) {
+                console.warn("Direct fetch clipboard copy failed. Using canvas fallback...", err);
+                try {
+                    // CORS制限対策としてのキャンバス描画フォールバック
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        img.src = imgUrl;
+                    });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) return false;
+                    ctx.drawImage(img, 0, 0);
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    if (!blob) return false;
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+                    return true;
+                } catch (fallbackErr) {
+                    console.error("Canvas clipboard copy also failed: ", fallbackErr);
+                    return false;
+                }
+            }
         }
 
         async function triggerReveal(seed) {
@@ -715,13 +760,11 @@
                 document.getElementById('btn-explorer-link').href = `https://ordinals.com/inscription/${wonItemId}`;
                 document.getElementById('btn-explorer-link').classList.remove('opacity-50', 'pointer-events-none');
                 
-                // 🌟 Twitter (X) シェア用URLを動的に生成 🌟
-                const siteUrl = "https://ck121212195.github.io/Gacha/";
-                const tweetText = `Just drew "${wonItemName}" from the "Bitcoin Ordinals Gashapon"! 🎰⚡️\n\nSpin the Gashapon here:`;
-                const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(siteUrl)}&hashtags=ordinals,gashapon`;
-                
+                // 🌟 最新当選情報を変数に格納し、シェアボタンをアクティブ化 🌟
+                lastWonItemImageUrl = finalRealImgUrl;
+                lastWonItemName = wonItemName;
+
                 const btnShare = document.getElementById('btn-share-twitter');
-                btnShare.href = twitterIntentUrl;
                 btnShare.classList.remove('opacity-50', 'pointer-events-none');
 
                 document.getElementById('btn-gamma-link').href = `https://gamma.io/inscription/${wonItemId}`;
@@ -752,6 +795,46 @@
                 setTimeout(() => document.getElementById('copy-text').textContent = pText, 2000);
             } catch (err) { alert("Failed to copy address."); }
         };
+
+        // 🌟 Twitter / Xシェアボタンクリック時の処理 🌟
+        document.getElementById('btn-share-twitter').addEventListener('click', async () => {
+            if (!lastWonItemImageUrl || !lastWonItemName) return;
+
+            const t = TRANSLATIONS[currentLang];
+            const btnTextElement = document.getElementById('btn-share-twitter-text');
+            const originalText = btnTextElement.textContent;
+
+            // ボタン表示を「画像をコピー中...」に変更
+            btnTextElement.textContent = currentLang === 'en' ? "Copying Image..." : "画像をコピー中...";
+            playAudio('click');
+
+            // 1. 当選したOrdinals画像を全自動でクリップボードにコピー
+            const copySuccess = await copyImageToClipboard(lastWonItemImageUrl);
+
+            // 2. 完了トーストを表示
+            if (copySuccess) {
+                showToast(currentLang === 'en' 
+                    ? "📋 Image copied! Paste (Ctrl+V) in X to attach." 
+                    : "📋 画像をコピーしました！Xの投稿画面で「貼り付け」して投稿してください。"
+                );
+            } else {
+                showToast(currentLang === 'en' 
+                    ? "Failed to copy image, opening X..." 
+                    : "画像のコピーに失敗しました。Xを開きます。"
+                );
+            }
+
+            // 元のボタンテキストに戻す
+            btnTextElement.textContent = originalText;
+
+            // 3. X（Twitter）投稿ページを開く
+            const siteUrl = "https://ck121212195.github.io/Gacha/";
+            const tweetText = `Just drew "${lastWonItemName}" from the "Bitcoin Ordinals Gashapon"! 🎰⚡️\n\nSpin the Gashapon here:`;
+            const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(siteUrl)}&hashtags=ordinals,gashapon`;
+
+            // 別タブで開く
+            window.open(twitterIntentUrl, '_blank', 'noopener,noreferrer');
+        });
 
         async function handleStartPay() {
             if (currentState === STATE.ROLLING || currentState === STATE.HAS_CAPSULE) {
@@ -820,9 +903,13 @@
             
             document.getElementById('action-blocker').classList.remove('hidden');
             document.getElementById('btn-explorer-link').classList.add('opacity-50', 'pointer-events-none');
-            document.getElementById('btn-share-twitter').classList.add('opacity-50', 'pointer-events-none'); // ★シェアボタン状態初期化
+            document.getElementById('btn-share-twitter').classList.add('opacity-50', 'pointer-events-none'); 
             document.getElementById('btn-gamma-link').classList.add('opacity-50', 'pointer-events-none');
             document.getElementById('btn-close-prize').classList.add('opacity-50', 'pointer-events-none');
+
+            // 当選情報の初期化
+            lastWonItemImageUrl = "";
+            lastWonItemName = "";
 
             currentState = STATE.IDLE; updateDisplayStateText();
         });
