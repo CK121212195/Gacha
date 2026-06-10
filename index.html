@@ -283,6 +283,12 @@
                 </div>
             </div>
 
+            <!-- 🌟 クリップボード自動コピー案内カード 🌟 -->
+            <div id="clipboard-helper-box" class="w-full max-w-xs bg-amber-50/40 border border-amber-100/60 px-3 py-2.5 rounded-xl text-center text-[10px] text-slate-500 leading-relaxed font-semibold">
+                <i class="fa-solid fa-circle-info text-amber-500 mr-1"></i>
+                <span id="clipboard-helper-text">...</span>
+            </div>
+
             <div class="grid grid-cols-2 gap-4 w-full max-w-xs text-xs">
                 <div class="bg-amber-50/60 p-2.5 rounded-xl border border-amber-100 text-center">
                     <span class="text-slate-400 font-bold block mb-0.5">INSCRIPTION NO</span>
@@ -301,7 +307,7 @@
                     <span id="btn-explorer-link-text">Verify On-Chain (ordinals.com)</span>
                 </a>
                 
-                <!-- 🌟 Twitter / Xシェアボタンをaタグからbutton要素に変更 🌟 -->
+                <!-- Twitter / Xシェアボタン -->
                 <button id="btn-share-twitter" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl text-center text-sm transition duration-150 flex items-center justify-center space-x-2 shadow-md shadow-slate-900/10 opacity-50 pointer-events-none">
                     <i class="fa-brands fa-x-twitter"></i>
                     <span id="btn-share-twitter-text">Share on X (Twitter)</span>
@@ -421,6 +427,7 @@
                 loadingText: "MINTING ARTIFACT...",
                 verifyOnChain: "Verify On-Chain (ordinals.com)",
                 shareTwitter: "Share on X (Twitter)", 
+                clipboardHelper: "Clicking 'Share on X' will automatically copy this image to your clipboard. Just paste it (Ctrl+V) in your post!", // ★コピー案内文（英語）
                 closeBtn: "Close",
                 gammaBtn: "Official Gamma",
                 optMultiverse: "🌌 Chaos Multiverse (Random selection)",
@@ -468,6 +475,7 @@
                 loadingText: "アーティファクト取得中...",
                 verifyOnChain: "ordinals.com でオンチェーン鑑定",
                 shareTwitter: "X（Twitter）に投稿する", 
+                clipboardHelper: "「Xに投稿する」を押すと、この画像が自動でクリップボードにコピーされます。投稿画面でそのまま「貼り付け（ペースト）」してください！", // ★コピー案内文（日本語）
                 closeBtn: "閉じる",
                 gammaBtn: "公式Gamma",
                 optMultiverse: "🌌 カオス・マルチバース (有名どころからランダム)",
@@ -546,6 +554,7 @@
             document.getElementById('loading-spinner-text').textContent = t.loadingText;
             document.getElementById('btn-explorer-link-text').textContent = t.verifyOnChain;
             document.getElementById('btn-share-twitter-text').textContent = t.shareTwitter; 
+            document.getElementById('clipboard-helper-text').textContent = t.clipboardHelper; // ★案内文翻訳適用
             document.getElementById('btn-close-prize').textContent = t.closeBtn;
             document.getElementById('btn-gamma-link-text').textContent = t.gammaBtn;
 
@@ -760,7 +769,7 @@
                 document.getElementById('btn-explorer-link').href = `https://ordinals.com/inscription/${wonItemId}`;
                 document.getElementById('btn-explorer-link').classList.remove('opacity-50', 'pointer-events-none');
                 
-                // 🌟 最新当選情報を変数に格納し、シェアボタンをアクティブ化 🌟
+                // 最新当選情報を変数に格納し、シェアボタンをアクティブ化
                 lastWonItemImageUrl = finalRealImgUrl;
                 lastWonItemName = wonItemName;
 
@@ -796,7 +805,7 @@
             } catch (err) { alert("Failed to copy address."); }
         };
 
-        // 🌟 Twitter / Xシェアボタンクリック時の処理 🌟
+        // Twitter / Xシェアボタンクリック時の処理
         document.getElementById('btn-share-twitter').addEventListener('click', async () => {
             if (!lastWonItemImageUrl || !lastWonItemName) return;
 
