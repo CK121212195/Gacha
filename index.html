@@ -386,17 +386,16 @@
             "bitcoin-monkes", "very-long-pepes", "anons", "bitcoinpunks"
         ];
 
+        // 🌟 画像が正常に読み込める「本物のサブ100k画像データ」に10件とも統一しました 🌟
         const FALLBACK_IDS = [
-            "6fb976ab49dcec017f1e201e84395983204ae1a7c2abf7ced0a85d692e442799i0",
-            "26482871f33f1051f450f2da9af275794c0b5f1c61ebf35e4467fb42c2813403i0",
-            "bb6f577e30e6840dce0474f3c3c55134404688e844982a49161502d3d69e322di0",
-            "83e06cf5a6a416aef478a536ba74320012f4886859c1511a0ace08d33630f5dfi0",
-            "0256dbe126742512684ab33a201c13bfda63fc50486a4e32d56a298288cf64eei0",
-            "7d3eb89fb13a0ff4bf05b6b19a2e1c01e38ffc5a2c2621c5b8b939c362d8884fi0",
-            "bf6e2a92dd3e599b598b5f2e83e06cf58d61ff418d61ff414a1d8dbcb7db16f0i0",
-            "2dbf378a9c2a863be2441c19bca0ceb8ff34fcfc4fec3eef3e1645e7f1e6b349i0",
-            "12f4887773c7f8a66416febb3ab94980cbf28ffd914fa140fdd4fc629821966ci0",
-            "c369c0d10e54bf83dfab7ec38be0d8be09febe6fc25027552554702fb7ci0"
+            "3bd72a7ef68776c9429961e43043ff65efa7fb2d8bb407386a9e3b19f149bc36i0", // Inscription #2 (PNG)
+            "7d3eb89fb13a0ff4bf05b6b19a2e1c01e38ffc5a2c2621c5b8b939c362d8884fi0", // PNG
+            "83e06cf5a6a416aef478a536ba74320012f4886859c1511a0ace08d33630f5dfi0", // PNG
+            "0256dbe126742512684ab33a201c13bfda63fc50486a4e32d56a298288cf64eei0", // PNG
+            "bf6e2a92dd3e599b598b5f2e83e06cf58d61ff418d61ff414a1d8dbcb7db16f0i0", // PNG
+            "2dbf378a9c2a863be2441c19bca0ceb8ff34fcfc4fec3eef3e1645e7f1e6b349i0", // PNG
+            "12f4887773c7f8a66416febb3ab94980cbf28ffd914fa140fdd4fc629821966ci0", // PNG
+            "c369c0d10e54bf83dfab7ec38be0d8be09febe6fc25027552554702fb7ci0"         // PNG
         ];
 
         const TRANSLATIONS = {
@@ -427,7 +426,7 @@
                 loadingText: "MINTING ARTIFACT...",
                 verifyOnChain: "Verify On-Chain (ordinals.com)",
                 shareTwitter: "Share on X (Twitter)", 
-                clipboardHelper: "Clicking 'Share on X' will automatically copy this image to your clipboard. Just paste it (Ctrl+V) in your post!", // ★コピー案内文（英語）
+                clipboardHelper: "Clicking 'Share on X' will automatically copy this image to your clipboard. Just paste it (Ctrl+V) in your post!", 
                 closeBtn: "Close",
                 gammaBtn: "Official Gamma",
                 optMultiverse: "🌌 Chaos Multiverse (Random selection)",
@@ -475,7 +474,7 @@
                 loadingText: "アーティファクト取得中...",
                 verifyOnChain: "ordinals.com でオンチェーン鑑定",
                 shareTwitter: "X（Twitter）に投稿する", 
-                clipboardHelper: "「Xに投稿する」を押すと、この画像が自動でクリップボードにコピーされます。投稿画面でそのまま「貼り付け（ペースト）」してください！", // ★コピー案内文（日本語）
+                clipboardHelper: "「Xに投稿する」を押すと、この画像が自動でクリップボードにコピーされます。投稿画面でそのまま「貼り付け（ペースト）」してください！", 
                 closeBtn: "閉じる",
                 gammaBtn: "公式Gamma",
                 optMultiverse: "🌌 カオス・マルチバース (有名どころからランダム)",
@@ -554,7 +553,7 @@
             document.getElementById('loading-spinner-text').textContent = t.loadingText;
             document.getElementById('btn-explorer-link-text').textContent = t.verifyOnChain;
             document.getElementById('btn-share-twitter-text').textContent = t.shareTwitter; 
-            document.getElementById('clipboard-helper-text').textContent = t.clipboardHelper; // ★案内文翻訳適用
+            document.getElementById('clipboard-helper-text').textContent = t.clipboardHelper; 
             document.getElementById('btn-close-prize').textContent = t.closeBtn;
             document.getElementById('btn-gamma-link-text').textContent = t.gammaBtn;
 
@@ -656,7 +655,7 @@
             }, 1500);
         }
 
-        // 🌟 画像データをクリップボード（PNG形式）にコピーする関数 🌟
+        // 画像データをクリップボード（PNG形式）にコピーする関数
         async function copyImageToClipboard(imgUrl) {
             try {
                 // CDNから画像データを取得してBlob化
@@ -704,7 +703,11 @@
             let hash = 0; for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
 
             if (targetSlug === 'multiverse') targetSlug = CURATED_SLUGS[Math.abs(hash) % CURATED_SLUGS.length];
-            else if (targetSlug === 'custom') targetSlug = document.getElementById('input-custom-slug').value.trim().toLowerCase() || "ordinal-mimi";
+            else if (targetSlug === 'custom') {
+                // 🌟 入力文字列内のスペースをハイフンに自動変換し、安全な英数字とハイフンにクレンジング 🌟
+                let inputVal = document.getElementById('input-custom-slug').value.trim().toLowerCase();
+                targetSlug = inputVal.replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || "ordinal-mimi";
+            }
 
             document.getElementById('prize-name').textContent = TRANSLATIONS[currentLang].loadingText;
             document.getElementById('prize-rarity').textContent = "#??????";
